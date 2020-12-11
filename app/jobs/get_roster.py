@@ -17,6 +17,7 @@ from app.utils import (
 
 REMOTE_PATH = 'https://github.com/mrcaseb/nflfastR-roster/blob/master/data/nflfastR-roster.csv.gz?raw=True'
 
+
 def _extract(path: str) -> pd.DataFrame:
     """Download CSV from remote path."""
     logging.info(f"Downloading remote roster CSV from {path}...")
@@ -38,7 +39,7 @@ def _load(df: pd.DataFrame, path: str) -> None:
 
 def run():
     logging.info("Getting roster data...")
-    
+
     df = _extract(REMOTE_PATH)
 
     local_path = os.path.join(ROSTER_DIRECTORY, 'play_by_play.csv')
@@ -47,5 +48,5 @@ def run():
 
 if __name__ == "__main__":
     configure_logging()
-    
+
     run()

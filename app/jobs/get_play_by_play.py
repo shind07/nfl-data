@@ -40,7 +40,7 @@ def _load(df: pd.DataFrame, path: str) -> None:
 
 def run():
     logging.info("Getting play by play data...")
-    
+
     remote_path = REMOTE_PATH_TEMPLATE.format(year=CURRENT_YEAR)
     df = _extract(remote_path)
 
@@ -50,5 +50,5 @@ def run():
 
 if __name__ == "__main__":
     configure_logging()
-    
+
     run()
