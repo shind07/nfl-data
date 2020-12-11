@@ -14,4 +14,4 @@ RUN rm tmp/requirements.txt
 WORKDIR /opt/nfl 
 COPY . .
 
-CMD [ "echo", "testing..." ]
+CMD [ "python3", "-m", "app" ]
