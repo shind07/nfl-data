@@ -12,7 +12,9 @@ build:
 
 .PHONY: run
 run:
-	@docker run $(IMAGE_NAME)
+	@docker run \
+		--rm \
+		-v $(shell PWD)/data:/$(WORKDIR)/data $(IMAGE_NAME)
 
 .PHONY: shell
 shell:
@@ -40,3 +42,7 @@ notebook:
 		-v $(shell PWD)/app:/$(WORKDIR)/app \
 		-v $(shell PWD)/notebooks:/$(WORKDIR)/notebooks \
 		$(IMAGE_NAME) jupyter notebook --ip=0.0.0.0 --allow-root .
+
+.PHONY: lint
+lint:
+	@flake8
