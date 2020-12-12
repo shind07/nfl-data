@@ -1,0 +1,37 @@
+---
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: data-nfl-pipeline-db
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres  # default POSTGRES_USER is postgres
+      POSTGRES_DB: nfl  # default is value of POSTGRES_USER
+    ports:
+      - 5432:5432
+  app:
+    build:
+      context: .
+      cache_from:
+        - scottyhind/nfl-data:latest
+    image: scottyhind/nfl-data
+    container_name: nfl-data-app
+    volumes:
+      - ./data:/${WORKDIR}/data
+      - ./notebooks:/${WORKDIR}/notebooks
+      - ./alembic:/${WORKDIR}/alembic
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    environment:
+      POSTGRES_PASSWORD: password  # default POSTGRES_USER is postgres
+      POSTGRES_DB: nfl  # default is value of POSTGRES_USER
+
+volumes:
+  db-data:
+    

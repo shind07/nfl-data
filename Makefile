@@ -43,6 +43,14 @@ notebook:
 		-v $(shell PWD)/notebooks:/$(WORKDIR)/notebooks \
 		$(IMAGE_NAME) jupyter notebook --ip=0.0.0.0 --allow-root .
 
+.PHONY: up
+up:
+	WORKDIR=$(WORKDIR) docker-compose up
+
+.PHONY: down
+down:
+	docker-compose down
+
 .PHONY: lint
 lint:
 	@flake8
