@@ -15,5 +15,6 @@ RUN rm tmp/requirements.txt
 WORKDIR /opt/nfl 
 COPY app app
 COPY alembic alembic
+COPY alembic.ini .
 
 CMD [ "python3", "-m", "app" ]
