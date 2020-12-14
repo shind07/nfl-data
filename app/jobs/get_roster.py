@@ -42,7 +42,7 @@ def run():
 
     df = _extract(REMOTE_PATH)
 
-    local_path = os.path.join(ROSTER_DIRECTORY, 'play_by_play.csv')
+    local_path = os.path.join(ROSTER_DIRECTORY, 'roster.csv')
     _load(df, local_path)
 
 

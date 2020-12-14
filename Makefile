@@ -16,16 +16,6 @@ run:
 		--rm \
 		-v $(shell PWD)/data:/$(WORKDIR)/data $(IMAGE_NAME)
 
-.PHONY: shell
-shell:
-	@docker run \
-		--rm \
-		-it \
-		-v $(shell PWD)/data:/$(WORKDIR)/data \
-		-v $(shell PWD)/app:/$(WORKDIR)/app \
-		-v $(shell PWD)/notebooks:/$(WORKDIR)/notebooks \
-		$(IMAGE_NAME) bash
-
 .PHONY: pipeline
 pipeline:
 	@docker run \
@@ -42,6 +32,26 @@ notebook:
 		-v $(shell PWD)/app:/$(WORKDIR)/app \
 		-v $(shell PWD)/notebooks:/$(WORKDIR)/notebooks \
 		$(IMAGE_NAME) jupyter notebook --ip=0.0.0.0 --allow-root .
+
+.PHONY: up
+up:
+	WORKDIR=$(WORKDIR) docker-compose up -d
+
+.PHONY: down
+down:
+	docker-compose down
+
+
+.PHONY: db-shell
+db-shell: 
+	docker-compose run app psql -U postgres --host postgres
+
+.PHONY: shell
+shell:
+	docker-compose run \
+		-v $(shell PWD)/alembic:/$(WORKDIR)/alembic \
+		-v $(shell PWD)/data:/$(WORKDIR)/data \
+		app bash
 
 .PHONY: lint
 lint:
