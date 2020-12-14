@@ -25,9 +25,9 @@ root@a9d76ffd19da:/opt/nfl# alembic upgrade head
 ```
 
 #### Reverting a Migration
-Downgrade back to nothing: `alembic downgrade base`
+`alembic downgrade base` - Downgrade back to nothing: 
 
-Downgrade to the previous version: `alembic downgrade -1`
+`alembic downgrade -1` - Downgrade to the previous version: 
 
 #### Useful commands
 ```bash
