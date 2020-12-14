@@ -5,6 +5,7 @@ RUN apt-get update \
         python3 \ 
         python3-pip \
         git \
+        postgresql-client \
     && apt-get clean
 
 COPY requirements.txt tmp/requirements.txt
@@ -12,6 +13,7 @@ RUN pip3 install -r tmp/requirements.txt
 RUN rm tmp/requirements.txt
 
 WORKDIR /opt/nfl 
-COPY . .
+COPY app app
+COPY alembic alembic
 
 CMD [ "python3", "-m", "app" ]
