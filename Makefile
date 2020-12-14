@@ -53,6 +53,12 @@ shell:
 		-v $(shell PWD)/data:/$(WORKDIR)/data \
 		app bash
 
+.PHONY: migrate
+migrate:
+	docker-compose run \
+		-v $(shell PWD)/alembic:/$(WORKDIR)/alembic \
+		app alembic upgrade head
+
 .PHONY: lint
 lint:
 	@flake8
