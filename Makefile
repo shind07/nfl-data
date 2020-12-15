@@ -12,9 +12,7 @@ build:
 
 .PHONY: run
 run:
-	@docker run \
-		--rm \
-		-v $(shell PWD)/data:/$(WORKDIR)/data $(IMAGE_NAME)
+	docker-compose run app
 
 .PHONY: pipeline
 pipeline:
@@ -44,7 +42,7 @@ down:
 
 .PHONY: db-shell
 db-shell: 
-	docker-compose run app psql -U postgres --host postgres
+	docker-compose run app psql -U postgres --host postgres -d nfl -w
 
 .PHONY: shell
 shell:
