@@ -19,6 +19,7 @@ depends_on = None
 def upgrade():
     op.execute("""
         CREATE TABLE play_by_play (
+            year INTEGER NOT NULL,
             play_id DECIMAL NOT NULL,
             game_id VARCHAR NOT NULL,
             old_game_id DECIMAL NOT NULL,
