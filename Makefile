@@ -41,7 +41,7 @@ down:
 
 
 .PHONY: db-shell
-db-shell: 
+db-shell:
 	docker-compose run app psql -U postgres --host postgres -d nfl -w
 
 .PHONY: shell
@@ -49,6 +49,7 @@ shell:
 	docker-compose run \
 		-v $(shell PWD)/alembic:/$(WORKDIR)/alembic \
 		-v $(shell PWD)/data:/$(WORKDIR)/data \
+		-v $(shell PWD)/app:/$(WORKDIR)/app \
 		app bash
 
 .PHONY: migrate
