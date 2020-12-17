@@ -8,11 +8,12 @@ from app.jobs import (
 
 def run():
     # raw data
-    # get_roster.run()
-    # get_play_by_play.run()
+    get_roster.run()
+    get_play_by_play.run()
 
     # aggregations
     rushing_by_player_by_game.run()
+
 
 if __name__ == "__main__":
     configure_logging()
