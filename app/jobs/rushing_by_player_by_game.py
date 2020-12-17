@@ -8,7 +8,7 @@ import pandas as pd
 from app.config import (
     configure_logging,
 )
-from app.db import get_db_conn
+from app.db import get_db_eng
 
 OUTPUT_TABLE_NAME = "rushing_by_player_by_game"
 
@@ -18,6 +18,7 @@ def _extract_designed(db_conn) -> pd.DataFrame:
     logging.info("Extracting designed rushing stats from play by play...")
     query = """
         SELECT
+            year,
             game_id,
             posteam AS team,
             defteam AS def_team,
@@ -39,7 +40,7 @@ def _extract_designed(db_conn) -> pd.DataFrame:
             AND two_point_attempt = 0
             AND rusher is not null
         GROUP BY
-            game_id, week, posteam, defteam, rusher_id, rusher
+            year, game_id, week, posteam, defteam, rusher_id, rusher
         ORDER BY
             yards DESC
     """
@@ -148,15 +149,14 @@ def _load(db_conn, df: pd.DataFrame) -> None:
 
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
-    db_conn = get_db_conn()
+    with get_db_eng().connect() as db_conn:
+        df_designed = _extract_designed(db_conn)
+        df_scrambles = _extract_scrambles(db_conn)
+        df_qb_kneels = _extract_qb_kneels(db_conn)
 
-    df_designed = _extract_designed(db_conn)
-    df_scrambles = _extract_scrambles(db_conn)
-    df_qb_kneels = _extract_qb_kneels(db_conn)
-
-    df = _transform(df_designed, df_scrambles, df_qb_kneels)
-    _load(db_conn, df)
-    logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
+        df = _transform(df_designed, df_scrambles, df_qb_kneels)
+        _load(db_conn, df)
+        logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
 
 
 if __name__ == "__main__":

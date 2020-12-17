@@ -10,7 +10,7 @@ from app.config import (
     configure_logging,
     CURRENT_YEAR,
 )
-from app.db import get_db_conn
+from app.db import get_db_eng
 
 REMOTE_PATH_TEMPLATE = 'https://github.com/guga31bb/nflfastR-data/blob/master/data/play_by_play_{year}.csv.gz?raw=True'
 OUTPUT_TABLE_NAME = 'play_by_play'
@@ -32,14 +32,15 @@ def _load(db_conn, df: pd.DataFrame) -> None:
     df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='replace')
 
 
-def run(year: str = CURRENT_YEAR) -> None:
+def run(year: int = CURRENT_YEAR) -> None:
     logging.info("Getting play by play data...")
     remote_path = REMOTE_PATH_TEMPLATE.format(year=year)
     df = _extract(remote_path)
+    df['year'] = year
 
-    db_conn = get_db_conn()
-    _load(db_conn, df)
-    logging.info("Play by play data loaded to db.")
+    with get_db_eng().connect() as db_conn:
+        _load(db_conn, df)
+        logging.info("Play by play data loaded to db.")
 
 
 if __name__ == "__main__":

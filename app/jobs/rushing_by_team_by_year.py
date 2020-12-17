@@ -10,7 +10,7 @@ import pandas as pd
 from app.config import (
     configure_logging,
 )
-from app.db import get_db_conn
+from app.db import get_db_eng
 
 OUTPUT_TABLE_NAME = "rushing_by_team_by_year"
 
@@ -20,6 +20,7 @@ def _extract(db_conn) -> pd.DataFrame:
     logging.info("Extracting rushing stats by team by year from play by play...")
     query = """
         SELECT
+            year,
             team,
             rush_type,
             SUM(attempts) AS attempts,
@@ -32,6 +33,7 @@ def _extract(db_conn) -> pd.DataFrame:
         FROM
             rushing_by_player_by_game
         GROUP BY
+            year,
             team,
             rush_type
         ORDER BY
@@ -50,11 +52,10 @@ def _load(db_conn, df: pd.DataFrame) -> None:
 
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
-    db_conn = get_db_conn()
-
-    df = _extract(db_conn)
-    _load(db_conn, df)
-    logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
+    with get_db_eng().connect() as db_conn:
+        df = _extract(db_conn)
+        _load(db_conn, df)
+        logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
 
 
 if __name__ == "__main__":

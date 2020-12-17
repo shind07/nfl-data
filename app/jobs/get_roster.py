@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 
 from app.config import configure_logging
-from app.db import get_db_conn
+from app.db import get_db_eng
 
 REMOTE_PATH = 'https://github.com/mrcaseb/nflfastR-roster/blob/master/data/nflfastR-roster.csv.gz?raw=True'
 OUTPUT_TABLE_NAME = 'roster'
@@ -29,9 +29,9 @@ def run() -> None:
     logging.info("Getting roster data...")
     df = _extract(REMOTE_PATH)
 
-    db_conn = get_db_conn()
-    _load(db_conn, df)
-    logging.info("Roster data loaded to db.")
+    with get_db_eng().connect() as db_conn:
+        _load(db_conn, df)
+        logging.info("Roster data loaded to db.")
 
 
 if __name__ == "__main__":
