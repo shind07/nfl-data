@@ -4,7 +4,7 @@ services:
   postgres:
     image: postgres:13.1
     container_name: nfl-db
-    restart: always
+    restart: on-failure
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:

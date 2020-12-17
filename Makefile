@@ -12,7 +12,7 @@ build:
 
 .PHONY: run
 run:
-	docker-compose run app
+	docker-compose run --rm app
 
 .PHONY: pipeline
 pipeline:
@@ -24,7 +24,7 @@ pipeline:
 .PHONY: notebook
 notebook:
 	WORKDIR=$(WORKDIR) \
-	docker-compose run \
+	docker-compose run --rm \
 		-p 8888:8888 \
 		-v $(shell PWD)/data:/$(WORKDIR)/data \
 		-v $(shell PWD)/app:/$(WORKDIR)/app \
@@ -41,19 +41,20 @@ down:
 
 
 .PHONY: db-shell
-db-shell: 
-	docker-compose run app psql -U postgres --host postgres -d nfl -w
+db-shell:
+	docker-compose run --rm app psql -U postgres --host postgres -d nfl -w
 
 .PHONY: shell
 shell:
-	docker-compose run \
+	docker-compose run --rm \
 		-v $(shell PWD)/alembic:/$(WORKDIR)/alembic \
 		-v $(shell PWD)/data:/$(WORKDIR)/data \
+		-v $(shell PWD)/app:/$(WORKDIR)/app \
 		app bash
 
 .PHONY: migrate
 migrate:
-	docker-compose run \
+	docker-compose run --rm \
 		-v $(shell PWD)/alembic:/$(WORKDIR)/alembic \
 		app alembic upgrade head
 

@@ -1,8 +1,8 @@
-"""create rushing tables
+"""create rushing by team by year
 
-Revision ID: c0cea8505ac5
-Revises: c2019f5f4de1
-Create Date: 2020-12-15 05:52:47.386708
+Revision ID: 2c9cfe924712
+Revises: 9337ebfa676f
+Create Date: 2020-12-17 10:11:43.720403
 
 """
 from alembic import op
@@ -10,22 +10,17 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c0cea8505ac5'
-down_revision = 'c2019f5f4de1'
+revision = '2c9cfe924712'
+down_revision = '9337ebfa676f'
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
     op.execute("""
-        CREATE TABLE rushing_by_player_by_game (
+        CREATE TABLE rushing_by_team_by_year (
             year INTEGER NOT NULL,
-            game_id VARCHAR NOT NULL,
             team VARCHAR NOT NULL,
-            def_team VARCHAR NOT NULL,
-            week DECIMAL NOT NULL,
-            rusher_id VARCHAR NOT NULL,
-            rusher VARCHAR NOT NULL,
             rush_type VARCHAR NOT NULL,
             attempts INTEGER NOT NULL,
             yards INTEGER NOT NULL,
@@ -40,5 +35,5 @@ def upgrade():
 
 def downgrade():
     op.execute("""
-        DROP TABLE IF EXISTS rushing_by_player_by_game;
+        DROP TABLE IF EXISTS rushing_by_team_by_year;
     """)
