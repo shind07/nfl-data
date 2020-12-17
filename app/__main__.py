@@ -20,6 +20,7 @@ def run():
     rushing_by_team_by_game.run()
     rushing_by_team_by_year.run()
 
+
 if __name__ == "__main__":
     configure_logging()
     run()
