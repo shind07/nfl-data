@@ -2,7 +2,7 @@
 version: '3.9'
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:13.1
     container_name: nfl-db
     restart: always
     volumes:
@@ -31,6 +31,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres  # default POSTGRES_USER is postgres
+      PGPASSWORD: postgres
       POSTGRES_HOST: postgres
       POSTGRES_DB: nfl  # default is value of POSTGRES_USER
 

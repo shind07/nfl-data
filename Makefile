@@ -12,9 +12,7 @@ build:
 
 .PHONY: run
 run:
-	@docker run \
-		--rm \
-		-v $(shell PWD)/data:/$(WORKDIR)/data $(IMAGE_NAME)
+	docker-compose run app
 
 .PHONY: pipeline
 pipeline:
@@ -25,13 +23,13 @@ pipeline:
 
 .PHONY: notebook
 notebook:
-	@docker run \
-		--rm \
+	WORKDIR=$(WORKDIR) \
+	docker-compose run \
 		-p 8888:8888 \
 		-v $(shell PWD)/data:/$(WORKDIR)/data \
 		-v $(shell PWD)/app:/$(WORKDIR)/app \
 		-v $(shell PWD)/notebooks:/$(WORKDIR)/notebooks \
-		$(IMAGE_NAME) jupyter notebook --ip=0.0.0.0 --allow-root .
+		app jupyter notebook --ip=0.0.0.0 --allow-root .
 
 .PHONY: up
 up:
@@ -44,7 +42,7 @@ down:
 
 .PHONY: db-shell
 db-shell: 
-	docker-compose run app psql -U postgres --host postgres
+	docker-compose run app psql -U postgres --host postgres -d nfl -w
 
 .PHONY: shell
 shell:
