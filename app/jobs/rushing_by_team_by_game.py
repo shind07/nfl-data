@@ -1,5 +1,5 @@
 """
-Creates a table with one row per rushing type (designed, scramble, qb_kneel, total) per player, per year.
+Creates a table with one row per rushing type (designed, scramble, qb_kneel, total) per team, per game.
 
 Upstream jobs: rushing_by_player_by_game
 """
@@ -12,17 +12,18 @@ from app.config import (
 )
 from app.db import get_db_conn
 
-OUTPUT_TABLE_NAME = "rushing_by_player_by_year"
+OUTPUT_TABLE_NAME = "rushing_by_team_by_game"
 
 
 def _extract(db_conn) -> pd.DataFrame:
-    """Getting designed rushing stats, per player per year, from the play by play."""
+    """Getting rushing stats, per team per game, from rushing_by_player_by_game."""
     logging.info("Extracting rushing stats by player by year from play by play...")
     query = """
         SELECT
+            game_id,
+            week,
             team,
-            rusher_id,
-            rusher,
+            def_team,
             rush_type,
             SUM(attempts) AS attempts,
             SUM(yards) AS yards,
@@ -33,10 +34,13 @@ def _extract(db_conn) -> pd.DataFrame:
             SUM(epa) AS epa
         FROM
             rushing_by_player_by_game
+        WHERE
+            rush_type = 'total'
         GROUP BY
+            game_id,
+            week,
             team,
-            rusher_id,
-            rusher,
+            def_team,
             rush_type
         ORDER BY
             SUM(yards) DESC
