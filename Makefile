@@ -29,7 +29,7 @@ notebook:
 		-v $(shell PWD)/data:/$(WORKDIR)/data \
 		-v $(shell PWD)/app:/$(WORKDIR)/app \
 		-v $(shell PWD)/notebooks:/$(WORKDIR)/notebooks \
-		app jupyter notebook --ip=0.0.0.0 --allow-root .
+		app jupyter notebook --ip=0.0.0.0 --allow-root notebooks
 
 .PHONY: up
 up:
