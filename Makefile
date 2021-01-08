@@ -14,13 +14,6 @@ build:
 run:
 	docker-compose run --rm app
 
-.PHONY: pipeline
-pipeline:
-	@docker run \
-		--rm \
-		-v $(shell PWD)/data:/$(WORKDIR)/data \
-		$(IMAGE_NAME) python3 -m app
-
 .PHONY: notebook
 notebook:
 	WORKDIR=$(WORKDIR) \
