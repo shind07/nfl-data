@@ -1,7 +1,8 @@
 from app.config import configure_logging
 from app.jobs import (
-    get_play_by_play,
-    get_roster,
+    play_by_play,
+    roster,
+    play_by_play_enriched,
     rushing_by_player_by_game,
     rushing_by_player_by_year,
     rushing_by_team_by_game,
@@ -11,10 +12,11 @@ from app.jobs import (
 
 def run():
     # raw data
-    get_roster.run()
-    get_play_by_play.run()
+    roster.run()
+    play_by_play.run()
 
     # aggregations
+    play_by_play_enriched.run()
     rushing_by_player_by_game.run()
     rushing_by_player_by_year.run()
     rushing_by_team_by_game.run()
