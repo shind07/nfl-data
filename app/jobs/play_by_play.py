@@ -13,7 +13,7 @@ from app.config import (
 from app.db import get_db_eng
 
 REMOTE_PATH_TEMPLATE = 'https://github.com/guga31bb/nflfastR-data/blob/master/data/play_by_play_{year}.csv.gz?raw=True'
-OUTPUT_TABLE_NAME = 'play_by_play'
+OUTPUT_TABLE_NAME = 'play_by_play_enriched'
 
 
 def _extract(path: str) -> pd.DataFrame:
@@ -26,10 +26,19 @@ def _extract(path: str) -> pd.DataFrame:
     )
 
 
+def _transform(db_conn, df: pd.DataFrame) -> pd.DataFrame:
+    """Filter out plays from the pbp data so we only upload new data"""
+    logging.info("Checking for new games in the play by play data...")
+    query = """SELECT DISTINCT game_id from play_by_play"""
+    df_existing_games = pd.read_sql(query, db_conn)
+    df_new_games = df[~df['game_id'].isin(df_existing_games['game_id'])]
+    return df_new_games
+
+
 def _load(db_conn, df: pd.DataFrame) -> None:
     """Write DF to database."""
     logging.info(f"Writing {len(df)} rows to {OUTPUT_TABLE_NAME}...")
-    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='replace')
+    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='append')
 
 
 def run(year: int = CURRENT_YEAR) -> None:
@@ -39,8 +48,14 @@ def run(year: int = CURRENT_YEAR) -> None:
     df['year'] = year
 
     with get_db_eng().connect() as db_conn:
+        df = _transform(db_conn, df)
+        if len(df) == 0:
+            logging.info("No new games found in play by play!")
+            return False
+
         _load(db_conn, df)
         logging.info("Play by play data loaded to db.")
+        return True
 
 
 if __name__ == "__main__":
