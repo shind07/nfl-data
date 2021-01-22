@@ -14,13 +14,6 @@ build:
 run:
 	docker-compose run --rm app
 
-.PHONY: pipeline
-pipeline:
-	@docker run \
-		--rm \
-		-v $(shell PWD)/data:/$(WORKDIR)/data \
-		$(IMAGE_NAME) python3 -m app
-
 .PHONY: notebook
 notebook:
 	WORKDIR=$(WORKDIR) \
@@ -29,7 +22,7 @@ notebook:
 		-v $(shell PWD)/data:/$(WORKDIR)/data \
 		-v $(shell PWD)/app:/$(WORKDIR)/app \
 		-v $(shell PWD)/notebooks:/$(WORKDIR)/notebooks \
-		app jupyter notebook --ip=0.0.0.0 --allow-root .
+		app jupyter notebook --ip=0.0.0.0 --allow-root notebooks
 
 .PHONY: up
 up:
