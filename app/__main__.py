@@ -14,8 +14,9 @@ from app.jobs import (
 
 def run():
     # raw data
+    new_games = play_by_play.run()
+    if not new_games: return
     roster.run()
-    play_by_play.run()
 
     # aggregations
     play_by_play_enriched.run()
