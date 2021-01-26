@@ -16,6 +16,10 @@ REMOTE_PATH_TEMPLATE = 'https://github.com/guga31bb/nflfastR-data/blob/master/da
 OUTPUT_TABLE_NAME = 'play_by_play_enriched'
 
 
+class NoNewGamesException(Exception):
+    pass
+
+
 def _extract(path: str) -> pd.DataFrame:
     """Download CSV from remote path."""
     logging.info(f"Downloading remote play by play CSV from {path}...")
@@ -50,12 +54,10 @@ def run(year: int = CURRENT_YEAR) -> None:
     with get_db_eng().connect() as db_conn:
         df = _transform(db_conn, df)
         if len(df) == 0:
-            logging.info("No new games found in play by play!")
-            return False
+            raise NoNewGamesException("No new games found in play by play!")
 
         _load(db_conn, df)
         logging.info("Play by play data loaded to db.")
-        return True
 
 
 if __name__ == "__main__":
