@@ -15,6 +15,7 @@ from app.jobs import (
     rushing_by_team_by_year,
 )
 
+
 def run():
     # raw data
     try:
