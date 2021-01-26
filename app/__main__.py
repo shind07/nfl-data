@@ -1,3 +1,5 @@
+import logging
+
 from app.config import configure_logging
 from app.jobs import (
     play_by_play,
@@ -14,8 +16,12 @@ from app.jobs import (
 
 def run():
     # raw data
-    new_games = play_by_play.run()
-    if not new_games: return
+    try:
+        play_by_play.run()
+    except play_by_play.NoNewGamesException as e:
+        logging.info(e)
+        return
+
     roster.run()
 
     # aggregations
