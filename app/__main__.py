@@ -23,9 +23,9 @@ def run():
         return
 
     roster.run()
+    play_by_play_enriched.run()
 
     # aggregations
-    play_by_play_enriched.run()
     passing_by_player_by_game.run()
     passing_by_player_by_year.run()
     rushing_by_player_by_game.run()
