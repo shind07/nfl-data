@@ -22,6 +22,7 @@ def upgrade():
             year SMALLINT NOT NULL,
             season_type VARCHAR NOT NULL,
             team VARCHAR NOT NULL,
+            game_id VARCHAR NOT NULL,
             passer VARCHAR NOT NULL,
             week SMALLINT NOT NULL,
             opp VARCHAR NOT NULL,

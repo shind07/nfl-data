@@ -22,6 +22,7 @@ def upgrade():
             year DECIMAL NOT NULL,
             season_type VARCHAR NOT NULL,
             team VARCHAR NOT NULL,
+            gsis_id VARCHAR NOT NULL,
             receiver VARCHAR,
             position VARCHAR,
             games SMALLINT NOT NULL,

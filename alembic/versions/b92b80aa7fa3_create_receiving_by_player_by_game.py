@@ -21,7 +21,9 @@ def upgrade():
         CREATE TABLE receiving_by_player_by_game (
             year SMALLINT NOT NULL,
             season_type VARCHAR NOT NULL,
+            game_id VARCHAR NOT NULL,
             team VARCHAR NOT NULL,
+            gsis_id VARCHAR NOT NULL,
             receiver VARCHAR NOT NULL,
             week SMALLINT NOT NULL,
             opp VARCHAR NOT NULL,
