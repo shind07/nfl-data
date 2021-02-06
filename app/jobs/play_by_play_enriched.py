@@ -60,21 +60,71 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         df_play_by_play['passer_player_name'],
         df_play_by_play['passer']
     )
-    df_play_by_play['gsis_id'] = df_play_by_play['receiver_id'].apply(_convert_to_gsis_id)
+    df_play_by_play['passer_gsis_id'] = df_play_by_play['passer_id'].apply(_convert_to_gsis_id)
+    df_play_by_play['receiver_gsis_id'] = df_play_by_play['receiver_id'].apply(_convert_to_gsis_id)
+    df_play_by_play['rusher_gsis_id'] = df_play_by_play['rusher_id'].apply(_convert_to_gsis_id)
 
-    logging.info("Adding receiver position data from roster table...")
+    logging.info("Adding position data from roster table...")
     df_roster_slim = df_roster[['season', 'position', 'gsis_id']]
     df_roster_slim = df_roster_slim.drop_duplicates()
     df_roster_slim = df_roster_slim[df_roster_slim['position'].notnull()]
     df_roster_slim = df_roster_slim[df_roster_slim['gsis_id'].notnull()]
+
     df_enriched = df_play_by_play.merge(
         df_roster_slim,
         how='left',
-        left_on=['season', 'gsis_id'],
+        left_on=['season', 'receiver_gsis_id'],
         right_on=['season', 'gsis_id']
     )
-    logging.info(f"Enriched {len(df_enriched)} rows of play by play data.")
+    df_enriched = df_enriched.rename(columns={'position': 'receiver_position'})
 
+    df_enriched = df_enriched.merge(
+        df_roster_slim,
+        how='left',
+        left_on=['season', 'rusher_gsis_id'],
+        right_on=['season', 'gsis_id']
+    )
+    df_enriched = df_enriched.rename(columns={'position': 'rusher_position'})
+
+    df_enriched = df_enriched.merge(
+        df_roster_slim,
+        how='left',
+        left_on=['season', 'passer_gsis_id'],
+        right_on=['season', 'gsis_id']
+    )
+    df_enriched = df_enriched.rename(columns={'position': 'passer_position'})
+
+    # Because there is no passer_id on qb spikes, we need to join on something else
+    df_roster['player'] = df_roster.apply(lambda row: f"{row['first_name'][0]}.{row['last_name']}", axis=1)
+    df_roster_slim = df_roster[['season', 'team', 'player', 'position', 'gsis_id']]
+    df_roster_slim = df_roster_slim.drop_duplicates()
+    df_roster_slim = df_roster_slim[df_roster_slim['position'].notnull()]
+    df_roster_slim = df_roster_slim[df_roster_slim['gsis_id'].notnull()]
+    df_roster_slim = df_roster_slim.rename(
+        columns={
+            'gsis_id': "gsis_id_2",
+            'position': 'position_2'
+        }
+    )
+    df_enriched = df_enriched.merge(
+        df_roster_slim,
+        how='left',
+        left_on=['season', 'posteam', 'passer'],
+        right_on=['season', 'team', 'player']
+    )
+    df_enriched['passer_gsis_id'] = np.where(
+        df_enriched['passer_gsis_id'].isna(),
+        df_enriched['gsis_id_2'],
+        df_enriched['passer_gsis_id']
+    )
+    df_enriched['passer_position'] = np.where(
+        df_enriched['passer_position'].isna(),
+        df_enriched['position_2'],
+        df_enriched['passer_position']
+    )
+    df_enriched = df_enriched.drop(['team', 'player', 'gsis_id_2', 'position_2'], axis=1)
+
+    logging.info(f"Enriched {len(df_enriched)} rows of play by play data.")
     return df_enriched
 
 

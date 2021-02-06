@@ -21,10 +21,13 @@ def _extract(db_conn) -> pd.DataFrame:
     query = """
         SELECT
             year,
+            season_type,
             team,
-            rusher_id,
+            gsis_id,
+            pos,
             rusher,
             rush_type,
+            COUNT(DISTINCT game_id) as games,
             SUM(attempts) AS attempts,
             SUM(yards) AS yards,
             SUM(td) AS td,
@@ -36,8 +39,10 @@ def _extract(db_conn) -> pd.DataFrame:
             rushing_by_player_by_game
         GROUP BY
             year,
+            season_type,
             team,
-            rusher_id,
+            gsis_id,
+            pos,
             rusher,
             rush_type
         ORDER BY

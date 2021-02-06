@@ -13,7 +13,7 @@ from app.config import (
 from app.db import get_db_eng
 
 REMOTE_PATH_TEMPLATE = 'https://github.com/guga31bb/nflfastR-data/blob/master/data/play_by_play_{year}.csv.gz?raw=True'
-OUTPUT_TABLE_NAME = 'play_by_play_enriched'
+OUTPUT_TABLE_NAME = 'play_by_play'
 
 
 class NoNewGamesException(Exception):

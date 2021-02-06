@@ -19,11 +19,12 @@ depends_on = None
 def upgrade():
     op.execute("""
         CREATE TABLE receiving_by_player_by_year (
-            year DECIMAL NOT NULL,
+            year SMALLINT NOT NULL,
             season_type VARCHAR NOT NULL,
             team VARCHAR NOT NULL,
-            receiver VARCHAR,
-            position VARCHAR,
+            gsis_id VARCHAR NOT NULL,
+            pos VARCHAR NOT NULL,
+            receiver VARCHAR NOT NULL,
             games SMALLINT NOT NULL,
             receptions SMALLINT NOT NULL,
             targets SMALLINT NOT NULL,
@@ -33,7 +34,8 @@ def upgrade():
             td SMALLINT NOT NULL,
             int SMALLINT NOT NULL,
             fumbles SMALLINT NOT NULL,
-            epa DECIMAL NOT NULL
+            epa DECIMAL NOT NULL,
+            cpoe DECIMAL NOT NULL
         );
     """)
 

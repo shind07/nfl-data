@@ -19,12 +19,14 @@ depends_on = None
 def upgrade():
     op.execute("""
         CREATE TABLE rushing_by_player_by_game (
-            year INTEGER NOT NULL,
+            year SMALLINT NOT NULL,
+            season_type VARCHAR NOT NULL,
             game_id VARCHAR NOT NULL,
             team VARCHAR NOT NULL,
-            def_team VARCHAR NOT NULL,
-            week DECIMAL NOT NULL,
-            rusher_id VARCHAR NOT NULL,
+            opp VARCHAR NOT NULL,
+            week SMALLINT NOT NULL,
+            gsis_id VARCHAR NOT NULL,
+            pos VARCHAR NOT NULL,
             rusher VARCHAR NOT NULL,
             rush_type VARCHAR NOT NULL,
             attempts INTEGER NOT NULL,

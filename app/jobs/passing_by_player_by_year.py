@@ -21,25 +21,45 @@ def _extract(db_conn) -> pd.DataFrame:
             year,
             season_type,
             posteam AS team,
+            passer_gsis_id AS gsis_id,
+            passer_position AS pos,
             passer,
-            COUNT(DISTINCT game_id) as games,
+            COUNT(DISTINCT p.game_id) AS games,
             SUM(complete_pass) AS completions,
             SUM(pass_attempt) AS attempts,
-            SUM(yards_gained) AS yards,
+            SUM(CASE WHEN lateral_rec_yards IS NOT NULL
+                THEN yards_gained + lateral_rec_yards
+                ELSE yards_gained END) as yards,
             SUM(air_yards) AS air_yards_intended,
             SUM(CASE WHEN complete_pass = 1 THEN air_yards ELSE 0 END) AS air_yards_completed,
             SUM(pass_touchdown) AS td,
-            SUM(interception) as int,
-            SUM(fumble) as fumbles,
-            SUM(epa) AS epa
+            SUM(interception) AS int,
+            SUM(fumble) AS fumbles,
+            SUM(CASE WHEN play_type = 'qb_spike' THEN 1 ELSE 0 END) AS spikes,
+            SUM(CASE WHEN play_type != 'qb_spike' THEN epa ELSE 0 END) AS epa,
+            SUM(epa) AS epa_total,
+            SUM(CASE WHEN play_type = 'qb_spike' THEN epa ELSE 0 END) AS epa_spike,
+            SUM(cpoe) / SUM(pass_attempts) AS cpoe
         FROM
-            play_by_play_enriched
+            play_by_play_enriched AS p
+        LEFT JOIN
+            (SELECT
+                game_id,
+                play_id,
+                SUM(lateral_rec_yards) as lateral_rec_yards
+            FROM
+                lateral_receiving_yards
+            GROUP BY
+                game_id, play_id
+            ) AS l
+        ON
+            p.game_id = l.game_id AND p.play_id = l.play_id
         WHERE
             (play_type = 'pass' or play_type = 'qb_spike')
             AND two_point_attempt = 0
             AND sack = 0
         GROUP BY
-            year, posteam, passer, season_type
+            year, posteam, passer_gsis_id, p.passer_position, passer, season_type
         ORDER BY
             epa DESC
     """

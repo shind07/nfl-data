@@ -20,27 +20,49 @@ def _extract(db_conn) -> pd.DataFrame:
         SELECT
             year,
             season_type,
+            p.game_id AS game_id,
             posteam AS team,
-            passer,
+            defteam AS opp,
             week,
-            defteam as opp,
+            passer_gsis_id AS gsis_id,
+            passer_position AS pos,
+            passer,
             SUM(complete_pass) AS completions,
             SUM(pass_attempt) AS attempts,
-            SUM(yards_gained) AS yards,
+            SUM(CASE WHEN lateral_rec_yards IS NOT NULL
+                THEN yards_gained + lateral_rec_yards
+                ELSE yards_gained END) AS yards,
             SUM(air_yards) AS air_yards_intended,
             SUM(CASE WHEN complete_pass = 1 THEN air_yards ELSE 0 END) AS air_yards_completed,
             SUM(pass_touchdown) AS td,
             SUM(interception) as int,
             SUM(fumble) as fumbles,
-            SUM(epa) AS epa
+            SUM(CASE WHEN play_type = 'qb_spike' THEN 1 ELSE 0 END) AS spikes,
+            SUM(CASE WHEN play_type != 'qb_spike' THEN epa ELSE 0 END) AS epa,
+            SUM(epa) AS epa_total,
+            SUM(CASE WHEN play_type = 'qb_spike' THEN epa ELSE 0 END) AS epa_spikes,
+            SUM(cpoe) / SUM(pass_attempts) AS cpoe
         FROM
-            play_by_play_enriched
+            play_by_play_enriched AS p
+        LEFT JOIN
+            (SELECT
+                game_id,
+                play_id,
+                SUM(lateral_rec_yards) as lateral_rec_yards
+            FROM
+                lateral_receiving_yards
+            GROUP BY
+                game_id, play_id
+            ) as l
+        ON
+            p.game_id = l.game_id AND p.play_id = l.play_id
         WHERE
             (play_type = 'pass' or play_type = 'qb_spike')
             AND two_point_attempt = 0
             AND sack = 0
         GROUP BY
-            year, week, defteam, posteam, passer, season_type
+            year, week, passer_gsis_id, passer_position,
+            p.game_id, defteam, posteam, passer, season_type
         ORDER BY
             epa DESC
     """
