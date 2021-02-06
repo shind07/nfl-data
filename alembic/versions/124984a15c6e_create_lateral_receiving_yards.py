@@ -19,6 +19,7 @@ depends_on = None
 def upgrade():
     op.execute("""
         CREATE TABLE lateral_receiving_yards (
+            year SMALLINT NOT NULL,
             game_id VARCHAR NOT NULL,
             play_id SMALLINT NOT NULL,
             stat_id SMALLINT NOT NULL,

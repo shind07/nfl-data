@@ -27,9 +27,9 @@ def _extract(db_conn) -> pd.DataFrame:
             COUNT(DISTINCT p.game_id) AS games,
             SUM(complete_pass) AS completions,
             SUM(pass_attempt) AS attempts,
-            SUM(CASE WHEN lateral_rec_yards IS NOT NULL 
+            SUM(CASE WHEN lateral_rec_yards IS NOT NULL
                 THEN yards_gained + lateral_rec_yards
-                ELSE yards_gained END) as yards, 
+                ELSE yards_gained END) as yards,
             SUM(air_yards) AS air_yards_intended,
             SUM(CASE WHEN complete_pass = 1 THEN air_yards ELSE 0 END) AS air_yards_completed,
             SUM(pass_touchdown) AS td,
@@ -42,7 +42,7 @@ def _extract(db_conn) -> pd.DataFrame:
             SUM(cpoe) / SUM(pass_attempts) AS cpoe
         FROM
             play_by_play_enriched AS p
-        LEFT JOIN 
+        LEFT JOIN
             (SELECT
                 game_id,
                 play_id,

@@ -122,7 +122,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         df_enriched['position_2'],
         df_enriched['passer_position']
     )
-    df_enriched = df_enriched.drop(['team', 'player','gsis_id_2', 'position_2'], axis=1)
+    df_enriched = df_enriched.drop(['team', 'player', 'gsis_id_2', 'position_2'], axis=1)
 
     logging.info(f"Enriched {len(df_enriched)} rows of play by play data.")
     return df_enriched

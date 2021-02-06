@@ -42,4 +42,3 @@ def run(year: int = CURRENT_YEAR) -> None:
 if __name__ == "__main__":
     configure_logging()
     run()
-
