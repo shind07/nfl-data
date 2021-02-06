@@ -1,5 +1,7 @@
 """
 Upstream jobs: play_by_play_enriched
+
+NOTE: entries where gsis_id are null are spikes.
 """
 import logging
 
@@ -20,10 +22,13 @@ def _extract(db_conn) -> pd.DataFrame:
         SELECT
             year,
             season_type,
+            game_id,
             posteam AS team,
-            receiver,
-            week,
             defteam as opp,
+            week,
+            receiver_gsis_id AS gsis_id,
+            receiver_position AS pos,
+            receiver,
             SUM(complete_pass) AS receptions,
             SUM(pass_attempt) AS targets,
             SUM(yards_gained) AS yards,
@@ -32,7 +37,8 @@ def _extract(db_conn) -> pd.DataFrame:
             SUM(pass_touchdown) AS td,
             SUM(interception) as int,
             SUM(fumble) as fumbles,
-            SUM(epa) AS epa
+            SUM(epa) AS epa,
+            SUM(cpoe) AS cpoe
         FROM
             play_by_play_enriched
         WHERE
@@ -40,7 +46,8 @@ def _extract(db_conn) -> pd.DataFrame:
             AND two_point_attempt = 0
             AND sack = 0
         GROUP BY
-            year, week, defteam, posteam, receiver, season_type
+            year, game_id, receiver_gsis_id, receiver_position, 
+            week, defteam, posteam, receiver, season_type
         ORDER BY
             epa DESC
     """

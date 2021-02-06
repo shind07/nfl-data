@@ -21,8 +21,9 @@ def _extract(db_conn) -> pd.DataFrame:
             year,
             season_type,
             posteam AS team,
+            receiver_gsis_id AS gsis_id,
+            receiver_position AS pos,
             receiver,
-            position,
             COUNT(DISTINCT game_id) as games,
             SUM(complete_pass) AS receptions,
             SUM(pass_attempt) AS targets,
@@ -30,9 +31,10 @@ def _extract(db_conn) -> pd.DataFrame:
             SUM(air_yards) AS air_yards_intended,
             SUM(CASE WHEN complete_pass = 1 THEN air_yards ELSE 0 END) AS air_yards_completed,
             SUM(pass_touchdown) AS td,
-            SUM(interception) as int,
-            SUM(fumble) as fumbles,
-            SUM(epa) AS epa
+            SUM(interception) AS int,
+            SUM(fumble) AS fumbles,
+            SUM(epa) AS epa,
+            sum(cpoe) AS cpoe
         FROM
             play_by_play_enriched
         WHERE
@@ -40,7 +42,7 @@ def _extract(db_conn) -> pd.DataFrame:
             AND two_point_attempt = 0
             AND sack = 0
         GROUP BY
-            year, posteam, position, receiver, season_type
+            year, posteam, receiver_gsis_id, receiver_position, receiver, season_type
         ORDER BY
             yards DESC
     """

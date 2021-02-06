@@ -19,11 +19,13 @@ def _extract_designed(db_conn) -> pd.DataFrame:
     query = """
         SELECT
             year,
+            season_type,
             game_id,
+            defteam AS opp,
             posteam AS team,
-            defteam AS def_team,
             week,
-            rusher_id,
+            rusher_gsis_id AS gsis_id,
+            rusher_position AS pos,
             rusher,
             'designed' AS rush_type,
             SUM(rush) AS attempts,
@@ -34,13 +36,14 @@ def _extract_designed(db_conn) -> pd.DataFrame:
             SUM(fumble_out_of_bounds) AS fumbles_out_of_bounds,
             SUM(epa) AS epa
         FROM
-            play_by_play
+            play_by_play_enriched
         WHERE
             play_type = 'run'
             AND two_point_attempt = 0
             AND rusher is not null
         GROUP BY
-            year, game_id, week, posteam, defteam, rusher_id, rusher
+            year, season_type, game_id, rusher_gsis_id, rusher_position,
+            week, posteam, defteam, rusher_id, rusher
         ORDER BY
             yards DESC
     """
@@ -58,11 +61,14 @@ def _extract_scrambles(db_conn) -> pd.DataFrame:
     logging.info("Extracting scramble rushing stats from play by play...")
     query = """
         SELECT
+            year,
+            season_type,
             game_id,
+            defteam AS opp,
             posteam AS team,
-            defteam AS def_team,
             week,
-            passer_id AS rusher_id,
+            passer_gsis_id AS gsis_id,
+            passer_position as pos,
             passer AS rusher,
             'scramble' AS rush_type,
             SUM(rush) AS attempts,
@@ -73,13 +79,14 @@ def _extract_scrambles(db_conn) -> pd.DataFrame:
             SUM(fumble_out_of_bounds) AS fumbles_out_of_bounds,
             SUM(epa) AS epa
         FROM
-            play_by_play
+            play_by_play_enriched
         WHERE
             play_type = 'run'
             AND two_point_attempt = 0
             AND passer is not null
         GROUP BY
-            game_id, week, posteam, defteam, passer_id, passer
+            year, season_type, game_id, week,
+            posteam, defteam, passer_position, passer_gsis_id, passer
         ORDER BY
             yards DESC
     """
@@ -93,11 +100,14 @@ def _extract_qb_kneels(db_conn) -> pd.DataFrame:
     logging.info("Extracting qb kneel stats from play by play...")
     query = """
         SELECT
+            year,
+            season_type,
             game_id,
+            defteam AS opp,
             posteam AS team,
-            defteam AS def_team,
             week,
-            rusher_id,
+            rusher_position as pos,
+            rusher_gsis_id as gsis_id,
             rusher,
             'qb_kneel' AS rush_type,
             SUM(rush) AS attempts,
@@ -108,11 +118,12 @@ def _extract_qb_kneels(db_conn) -> pd.DataFrame:
             SUM(fumble_out_of_bounds) AS fumbles_out_of_bounds,
             SUM(epa) AS epa
         FROM
-            play_by_play
+            play_by_play_enriched
         WHERE
             play_type = 'qb_kneel'
         GROUP BY
-            game_id, week, posteam, defteam, rusher_id, rusher
+            year, season_type, game_id, week,
+            posteam, defteam, rusher_position, rusher_gsis_id, rusher
         ORDER BY
             yards DESC
     """
@@ -132,7 +143,7 @@ def _transform(df_designed, df_scrambles, df_qb_kneels) -> pd.DataFrame:
     logging.info("Calculating total rushing stats...")
     df_all = pd.concat([df_designed, df_scrambles, df_qb_kneels])
 
-    grouping_cols = ['game_id', 'team', 'def_team', 'week', 'rusher_id', 'rusher']
+    grouping_cols = ['year', 'season_type', 'game_id', 'team', 'opp', 'week', 'gsis_id', 'pos', 'rusher']
     df_totals = df_all.groupby(grouping_cols, as_index=False).sum()
     df_totals['rush_type'] = 'total'
     df_final = pd.concat([df_all, df_totals])
