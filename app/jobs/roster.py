@@ -10,10 +10,14 @@ import logging
 
 import pandas as pd
 
-from app.config import configure_logging
+from app.config import (
+    configure_logging,
+    CURRENT_YEAR,
+)
 from app.db import get_db_eng
+from app.utils import load
 
-REMOTE_PATH = 'https://raw.githubusercontent.com/mrcaseb/nflfastR-roster/master/data/seasons/roster_2020.csv'
+REMOTE_PATH = 'https://raw.githubusercontent.com/mrcaseb/nflfastR-roster/master/data/seasons/roster_{year}.csv'
 OUTPUT_TABLE_NAME = 'roster'
 
 
@@ -27,18 +31,12 @@ def _extract(path: str) -> pd.DataFrame:
     )
 
 
-def _load(db_conn, df: pd.DataFrame) -> None:
-    """Write DF to database."""
-    logging.info(f"Writing {len(df)} rows to {OUTPUT_TABLE_NAME}...")
-    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='replace')
-
-
-def run() -> None:
+def run(year: int = CURRENT_YEAR) -> None:
     logging.info("Getting roster data...")
-    df = _extract(REMOTE_PATH)
+    df = _extract(REMOTE_PATH.format(year=year))
 
     with get_db_eng().connect() as db_conn:
-        _load(db_conn, df)
+        load(db_conn, df, OUTPUT_TABLE_NAME, overwrite=False)
         logging.info("Roster data loaded to db.")
 
 

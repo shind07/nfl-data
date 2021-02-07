@@ -11,6 +11,7 @@ from app.config import (
     CURRENT_YEAR,
 )
 from app.db import get_db_eng
+from app.utils import load
 
 REMOTE_PATH_TEMPLATE = 'https://github.com/guga31bb/nflfastR-data/blob/master/data/play_by_play_{year}.csv.gz?raw=True'
 OUTPUT_TABLE_NAME = 'play_by_play'
@@ -39,25 +40,16 @@ def _transform(db_conn, df: pd.DataFrame) -> pd.DataFrame:
     return df_new_games
 
 
-def _load(db_conn, df: pd.DataFrame) -> None:
-    """Write DF to database."""
-    logging.info(f"Writing {len(df)} rows to {OUTPUT_TABLE_NAME}...")
-    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='append')
-
-
 def run(year: int = CURRENT_YEAR) -> None:
     logging.info("Getting play by play data...")
-    remote_path = REMOTE_PATH_TEMPLATE.format(year=year)
-    df = _extract(remote_path)
+    df = _extract(REMOTE_PATH_TEMPLATE.format(year=year))
     df['year'] = year
 
     with get_db_eng().connect() as db_conn:
         df = _transform(db_conn, df)
         if len(df) == 0:
             raise NoNewGamesException("No new games found in play by play!")
-
-        _load(db_conn, df)
-        logging.info("Play by play data loaded to db.")
+        load(db_conn, df, OUTPUT_TABLE_NAME, overwrite=False)
 
 
 if __name__ == "__main__":

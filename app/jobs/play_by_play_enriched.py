@@ -22,6 +22,7 @@ from app.config import (
     CURRENT_YEAR
 )
 from app.db import get_db_eng
+from app.utils import load
 
 OUTPUT_TABLE_NAME = 'play_by_play_enriched'
 
@@ -128,18 +129,12 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
     return df_enriched
 
 
-def _load(db_conn, df: pd.DataFrame) -> None:
-    """Write DF to database."""
-    logging.info(f"Writing {len(df)} rows to {OUTPUT_TABLE_NAME}...")
-    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='replace')
-
-
 def run(year: int = CURRENT_YEAR) -> None:
     logging.info("Enriching play by play data with roster data...")
     with get_db_eng().connect() as db_conn:
         df_play_by_play, df_roster = _extract(db_conn)
         df_play_by_play_enriched = _transform(df_play_by_play, df_roster)
-        _load(db_conn, df_play_by_play_enriched)
+        load(db_conn, df_play_by_play_enriched, OUTPUT_TABLE_NAME, overwrite=False)
 
 
 if __name__ == "__main__":
