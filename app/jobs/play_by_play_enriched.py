@@ -78,6 +78,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'receiver_position'})
+    df_enriched = df_enriched.drop(columns=['gsis_id'])
 
     df_enriched = df_enriched.merge(
         df_roster_slim,
@@ -86,6 +87,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'rusher_position'})
+    df_enriched = df_enriched.drop(columns=['gsis_id'])
 
     df_enriched = df_enriched.merge(
         df_roster_slim,
@@ -94,6 +96,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'passer_position'})
+    df_enriched = df_enriched.drop(columns=['gsis_id'])
 
     # Because there is no passer_id on qb spikes, we need to join on something else
     df_roster['player'] = df_roster.apply(lambda row: f"{row['first_name'][0]}.{row['last_name']}", axis=1)
