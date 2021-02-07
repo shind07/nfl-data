@@ -39,6 +39,7 @@ def upgrade():
             sportradar_id VARCHAR,
             yahoo_id DECIMAL,
             rotowire_id DECIMAL,
+            pff_id DECIMAL,
             update_dt TIMESTAMP WITHOUT TIME ZONE,
             headshot_url VARCHAR
         );

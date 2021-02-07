@@ -28,7 +28,7 @@ def _atomic_rewrite(db_conn, df: pd.DataFrame, table_name: str) -> None:
     db_conn.execute(f"""DROP TABLE {table_name}_temp;""")
 
 
-def load(db_conn, df: pd.DataFrame, table_name: str, overwrite: bool, backup: bool = False) -> None:
+def load(db_conn, df: pd.DataFrame, table_name: str, overwrite: bool = True, backup: bool = False) -> None:
     """Write a pandas DataFrame to a database."""
     logging.info(f"Writing {len(df)} rows to {table_name}...")
 
