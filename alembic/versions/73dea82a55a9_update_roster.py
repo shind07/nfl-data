@@ -9,7 +9,7 @@ from alembic import op
 import sqlalchemy as sa
 
 
-# revision identifiers, used by Alembic.
+# revision identifiers, used by Alembic.    
 revision = '73dea82a55a9'
 down_revision = '2c9cfe924712'
 branch_labels = None
@@ -20,7 +20,7 @@ def upgrade():
     op.execute("""
         DROP TABLE IF EXISTS roster;
         CREATE TABLE roster (
-            season DECIMAL NOT NULL,
+            season SMALLINT NOT NULL,
             team VARCHAR,
             position VARCHAR,
             depth_chart_position VARCHAR,
