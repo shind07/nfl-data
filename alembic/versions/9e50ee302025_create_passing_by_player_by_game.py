@@ -38,7 +38,7 @@ def upgrade():
             fumbles SMALLINT NOT NULL,
             spikes SMALLINT NOT NULL,
             epa DECIMAL NOT NULL,
-            epa_spike DECIMAL NOT NULL,
+            epa_spikes DECIMAL NOT NULL,
             epa_total DECIMAL NOT NULL,
             cpoe DECIMAL NOT NULL
         ); 
