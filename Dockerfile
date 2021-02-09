@@ -17,4 +17,4 @@ COPY app app
 COPY alembic alembic
 COPY alembic.ini .
 
-CMD [ "python3", "-m", "app" ]
+CMD [ "python3", "-m", "app.pipeline" ]

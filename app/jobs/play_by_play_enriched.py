@@ -22,6 +22,7 @@ from app.config import (
     CURRENT_YEAR
 )
 from app.db import get_db_eng
+from app.utils import load
 
 OUTPUT_TABLE_NAME = 'play_by_play_enriched'
 
@@ -77,6 +78,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'receiver_position'})
+    df_enriched = df_enriched.drop(columns=['gsis_id'])
 
     df_enriched = df_enriched.merge(
         df_roster_slim,
@@ -85,6 +87,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'rusher_position'})
+    df_enriched = df_enriched.drop(columns=['gsis_id'])
 
     df_enriched = df_enriched.merge(
         df_roster_slim,
@@ -93,6 +96,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'passer_position'})
+    df_enriched = df_enriched.drop(columns=['gsis_id'])
 
     # Because there is no passer_id on qb spikes, we need to join on something else
     df_roster['player'] = df_roster.apply(lambda row: f"{row['first_name'][0]}.{row['last_name']}", axis=1)
@@ -128,18 +132,12 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
     return df_enriched
 
 
-def _load(db_conn, df: pd.DataFrame) -> None:
-    """Write DF to database."""
-    logging.info(f"Writing {len(df)} rows to {OUTPUT_TABLE_NAME}...")
-    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='replace')
-
-
 def run(year: int = CURRENT_YEAR) -> None:
     logging.info("Enriching play by play data with roster data...")
     with get_db_eng().connect() as db_conn:
         df_play_by_play, df_roster = _extract(db_conn)
         df_play_by_play_enriched = _transform(df_play_by_play, df_roster)
-        _load(db_conn, df_play_by_play_enriched)
+        load(db_conn, df_play_by_play_enriched, OUTPUT_TABLE_NAME, overwrite=False)
 
 
 if __name__ == "__main__":

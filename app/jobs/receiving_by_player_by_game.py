@@ -12,6 +12,7 @@ from app.config import (
     configure_logging,
 )
 from app.db import get_db_eng
+from app.utils import load
 
 OUTPUT_TABLE_NAME = "receiving_by_player_by_game"
 
@@ -46,9 +47,10 @@ def _extract(db_conn) -> pd.DataFrame:
             FROM
                 play_by_play_enriched
             WHERE
-                (play_type = 'pass' or play_type = 'qb_spike')
+                play_type = 'pass'
                 AND two_point_attempt = 0
                 AND sack = 0
+                AND receiver IS NOT NULL
             GROUP BY
                 year, game_id, receiver_gsis_id, receiver_position,
                 week, defteam, posteam, receiver, season_type
@@ -84,18 +86,12 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop('lateral_rec_yards', axis=1)
 
 
-def _load(db_conn, df: pd.DataFrame) -> None:
-    """Write DF to database."""
-    logging.info(f"Writing {len(df)} rows to {OUTPUT_TABLE_NAME}...")
-    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='replace')
-
-
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
     with get_db_eng().connect() as db_conn:
         df = _extract(db_conn)
         df = _transform(df)
-        _load(db_conn, df)
+        load(db_conn, df, OUTPUT_TABLE_NAME)
         logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
 
 

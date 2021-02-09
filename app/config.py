@@ -3,6 +3,7 @@ import os
 
 APP_NAME = "app"
 DATA_DIRECTORY = "data"
+START_YEAR = 1999
 CURRENT_YEAR = 2020
 
 GAMES_DIRECTORY = os.path.join(DATA_DIRECTORY, "games")
