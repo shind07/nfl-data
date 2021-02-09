@@ -14,6 +14,8 @@ from app.jobs import (
     passing_by_player_by_year,
     receiving_by_player_by_game,
     receiving_by_player_by_year,
+    receiving_by_team_by_game,
+    receiving_by_team_by_year,
     rushing_by_player_by_game,
     rushing_by_player_by_year,
     rushing_by_team_by_game,
@@ -36,8 +38,12 @@ def run(year: int = CURRENT_YEAR):
     # aggregations
     passing_by_player_by_game.run()
     passing_by_player_by_year.run()
+
     receiving_by_player_by_game.run()
     receiving_by_player_by_year.run()
+    receiving_by_team_by_game.run()
+    receiving_by_team_by_year.run()
+    
     rushing_by_player_by_game.run()
     rushing_by_player_by_year.run()
     rushing_by_team_by_game.run()
