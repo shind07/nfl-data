@@ -43,7 +43,7 @@ def run(year: int = CURRENT_YEAR):
     receiving_by_player_by_year.run()
     receiving_by_team_by_game.run()
     receiving_by_team_by_year.run()
-    
+
     rushing_by_player_by_game.run()
     rushing_by_player_by_year.run()
     rushing_by_team_by_game.run()
