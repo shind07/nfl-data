@@ -8,6 +8,7 @@ play by play, so we need to convert the play by play id to the same format for j
 """
 import logging
 
+import numpy as np
 import pandas as pd
 
 from app.config import (
@@ -31,9 +32,20 @@ def _extract(path: str) -> pd.DataFrame:
     )
 
 
+def _transform(df: pd.DataFrame) -> pd.DataFrame:
+    """Have to manually fix minshew since his PBP name doesn't match the roster name"""
+    df['last_name'] = np.where(
+        df["last_name"] == 'Minshew',
+        'Minshew II',
+        df['last_name']
+    )
+    return df
+
+
 def run(year: int = CURRENT_YEAR) -> None:
     logging.info("Getting roster data...")
     df = _extract(REMOTE_PATH.format(year=year))
+    df = _transform(df)
 
     with get_db_eng().connect() as db_conn:
         load(db_conn, df, OUTPUT_TABLE_NAME, overwrite=False)
