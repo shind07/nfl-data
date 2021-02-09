@@ -39,7 +39,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 SUM(interception) AS int,
                 SUM(fumble) AS fumbles,
                 SUM(epa) AS epa,
-                SUM(cpoe) / SUM(pass_attempt) AS cpoe
+                SUM(cpoe) AS cpoe
             FROM
                 play_by_play_enriched
             WHERE
