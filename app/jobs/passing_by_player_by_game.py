@@ -42,7 +42,7 @@ def _extract(db_conn) -> pd.DataFrame:
             SUM(CASE WHEN play_type != 'qb_spike' THEN epa ELSE 0 END) AS epa,
             SUM(epa) AS epa_total,
             SUM(CASE WHEN play_type = 'qb_spike' THEN epa ELSE 0 END) AS epa_spikes,
-            CASE WHEN 
+            CASE WHEN
                 SUM(cpoe) IS NULL OR SUM(pass_attempt) = 0 THEN 0
                 ELSE SUM(cpoe) / SUM(pass_attempt) END
             AS cpoe
