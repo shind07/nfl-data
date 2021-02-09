@@ -21,6 +21,7 @@ def _atomic_rewrite(db_conn, df: pd.DataFrame, table_name: str) -> None:
     so by doing this we maintain the schema when overwriting a table.
     """
     db_conn.execute(f"""
+        DROP TABLE IF EXISTS {table_name}_temp;
         CREATE TABLE {table_name}_temp AS TABLE {table_name};
         TRUNCATE TABLE {table_name};
     """)
