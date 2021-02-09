@@ -47,9 +47,10 @@ def _extract(db_conn) -> pd.DataFrame:
             FROM
                 play_by_play_enriched
             WHERE
-                (play_type = 'pass' or play_type = 'qb_spike')
+                play_type = 'pass'
                 AND two_point_attempt = 0
                 AND sack = 0
+                AND receiver IS NOT NULL
             GROUP BY
                 year, game_id, receiver_gsis_id, receiver_position,
                 week, defteam, posteam, receiver, season_type
