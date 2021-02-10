@@ -11,6 +11,8 @@ PLAY_BY_PLAY_DIRECTORY = os.path.join(DATA_DIRECTORY, "play_by_play")
 ROSTER_DIRECTORY = os.path.join(DATA_DIRECTORY, "roster")
 DERIVED_DATA_DIRECTORY = os.path.join(DATA_DIRECTORY, 'derived')
 
+HEADSHOTS_DIRECTORY = os.path.join(DATA_DIRECTORY, 'headshots')
+
 
 def configure_logging():
     logging.basicConfig(
