@@ -4,7 +4,15 @@ import time
 
 import pandas as pd
 
-from app.config import DATA_DIRECTORY
+from app.config import DATA_DIRECTORY, HEADSHOTS_DIRECTORY
+
+
+def get_headshot_path(season: str, team: str, gsis_id: str) -> str:
+    """Deterministically generate the local path to the headshot png."""
+    return os.path.join(
+        HEADSHOTS_DIRECTORY,
+        f"{season}_{team}_{gsis_id}.png"
+    )
 
 
 def init_directory(path: str) -> None:
