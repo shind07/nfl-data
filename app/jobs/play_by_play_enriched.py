@@ -21,8 +21,8 @@ from app.config import (
     configure_logging,
     CURRENT_YEAR
 )
-from app.db import get_db_eng
-from app.utils import load
+from app.db import get_db_eng, load
+
 
 OUTPUT_TABLE_NAME = 'play_by_play_enriched'
 

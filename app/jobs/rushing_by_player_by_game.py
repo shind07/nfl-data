@@ -8,7 +8,7 @@ import pandas as pd
 from app.config import (
     configure_logging,
 )
-from app.db import get_db_eng
+from app.db import get_db_eng, load
 
 OUTPUT_TABLE_NAME = "rushing_by_player_by_game"
 
@@ -152,12 +152,6 @@ def _transform(df_designed, df_scrambles, df_qb_kneels) -> pd.DataFrame:
     return df_final
 
 
-def _load(db_conn, df: pd.DataFrame) -> None:
-    """Write DF to database."""
-    logging.info(f"Writing {len(df)} rows to {OUTPUT_TABLE_NAME}...")
-    df.to_sql(OUTPUT_TABLE_NAME, db_conn, index=False, if_exists='replace')
-
-
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
     with get_db_eng().connect() as db_conn:
@@ -166,7 +160,7 @@ def run() -> None:
         df_qb_kneels = _extract_qb_kneels(db_conn)
 
         df = _transform(df_designed, df_scrambles, df_qb_kneels)
-        _load(db_conn, df)
+        load(db_conn, df, OUTPUT_TABLE_NAME)
         logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
 
 

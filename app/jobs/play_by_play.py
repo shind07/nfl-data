@@ -10,8 +10,8 @@ from app.config import (
     configure_logging,
     CURRENT_YEAR,
 )
-from app.db import get_db_eng
-from app.utils import load
+from app.db import get_db_eng, load
+
 
 REMOTE_PATH_TEMPLATE = 'https://github.com/guga31bb/nflfastR-data/blob/master/data/play_by_play_{year}.csv.gz?raw=True'
 OUTPUT_TABLE_NAME = 'play_by_play'

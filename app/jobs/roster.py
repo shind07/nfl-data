@@ -15,8 +15,8 @@ from app.config import (
     configure_logging,
     CURRENT_YEAR,
 )
-from app.db import get_db_eng
-from app.utils import load
+from app.db import get_db_eng, load
+
 
 REMOTE_PATH = 'https://raw.githubusercontent.com/mrcaseb/nflfastR-roster/master/data/seasons/roster_{year}.csv'
 OUTPUT_TABLE_NAME = 'roster'

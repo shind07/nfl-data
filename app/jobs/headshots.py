@@ -2,18 +2,15 @@
 https://github.com/fantasydatapros/nflfastpy/blob/master/examples/Roster%20Data%20and%20Team%20Logo%20Data.ipynb
 """
 import logging
-import time
-import urllib.request
 
 import pandas as pd
 
 from app.config import configure_logging, HEADSHOTS_DIRECTORY
-from app.db import get_db_eng
+from app.db import get_db_eng, load
 from app.utils import (
     get_headshot_path,
     download_image,
     init_directory,
-    load
 )
 
 OUTPUT_TABLE_NAME = 'headshots'
