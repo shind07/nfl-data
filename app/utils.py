@@ -45,14 +45,16 @@ def download_image(remote_path: str, local_path: str) -> bool:
 
 
 def download_team_logos() -> None:
-    """Download the team logos from the remote paths in the CSV. """
+    """Download the team logos from the remote paths in the CSV."""
     init_directory(TEAM_LOGOS_DIRECTORY)
     df = pd.read_csv(TEAM_LOGOS_CSV_PATH)
+
     df['local_path'] = TEAM_LOGOS_DIRECTORY + '/wordmark_' + df['team_abbr'] + '.png'
     df['success'] = df.apply(
         lambda row: download_image(row['team_wordmark'], row['local_path']),
         axis=1
     )
+    
     df['local_path'] = TEAM_LOGOS_DIRECTORY + '/logo_' + df['team_abbr'] + '.png'
     df['success'] = df.apply(
         lambda row: download_image(row['team_logo_wikipedia'], row['local_path']),
