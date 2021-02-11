@@ -12,6 +12,8 @@ ROSTER_DIRECTORY = os.path.join(DATA_DIRECTORY, "roster")
 DERIVED_DATA_DIRECTORY = os.path.join(DATA_DIRECTORY, 'derived')
 
 HEADSHOTS_DIRECTORY = os.path.join(DATA_DIRECTORY, 'headshots')
+TEAM_LOGOS_DIRECTORY = os.path.join(DATA_DIRECTORY, 'logos')
+TEAM_LOGOS_CSV_PATH = os.path.join(TEAM_LOGOS_DIRECTORY, 'teams_logos_colors.csv')
 
 
 def configure_logging():

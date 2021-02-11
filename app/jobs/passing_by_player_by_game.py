@@ -8,8 +8,7 @@ import pandas as pd
 from app.config import (
     configure_logging,
 )
-from app.db import get_db_eng
-from app.utils import load
+from app.db import get_db_eng, load
 
 OUTPUT_TABLE_NAME = "passing_by_player_by_game"
 

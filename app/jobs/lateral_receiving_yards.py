@@ -6,8 +6,8 @@ from app.config import (
     configure_logging,
     CURRENT_YEAR,
 )
-from app.db import get_db_eng
-from app.utils import load
+from app.db import get_db_eng, load
+
 
 REMOTE_PATH_TEMPLATE = 'https://raw.githubusercontent.com/mrcaseb/nfl-data/master/data/lateral_rec_yards/lateral_receiving_yards_{year}.csv'
 OUTPUT_TABLE_NAME = 'lateral_receiving_yards'
