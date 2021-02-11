@@ -10,7 +10,6 @@ from app.config import (
 )
 from app.db import get_db_eng, load
 
-
 OUTPUT_TABLE_NAME = "passing_by_player_by_game"
 
 

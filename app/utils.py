@@ -6,7 +6,6 @@ import urllib.request
 import pandas as pd
 
 from app.config import (
-    DATA_DIRECTORY,
     HEADSHOTS_DIRECTORY,
     TEAM_LOGOS_DIRECTORY,
     TEAM_LOGOS_CSV_PATH
@@ -30,7 +29,7 @@ def get_headshot_path(season: str, team: str, gsis_id: str) -> str:
 
 def download_image(remote_path: str, local_path: str) -> bool:
     """Download an image, return True if successful else False.
-    
+
     Adding a sleep at the end to avoid spamming a remote path.
     """
     logging.info(f"Saving image from {remote_path} to {local_path}....")
@@ -54,7 +53,7 @@ def download_team_logos() -> None:
         lambda row: download_image(row['team_wordmark'], row['local_path']),
         axis=1
     )
-    
+
     df['local_path'] = TEAM_LOGOS_DIRECTORY + '/logo_' + df['team_abbr'] + '.png'
     df['success'] = df.apply(
         lambda row: download_image(row['team_logo_wikipedia'], row['local_path']),
