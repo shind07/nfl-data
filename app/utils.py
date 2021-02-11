@@ -1,10 +1,16 @@
 import logging
 import os
 import time
+import urllib.request
 
 import pandas as pd
 
-from app.config import DATA_DIRECTORY, HEADSHOTS_DIRECTORY
+from app.config import (
+    DATA_DIRECTORY,
+    HEADSHOTS_DIRECTORY,
+    TEAM_LOGOS_DIRECTORY,
+    TEAM_LOGOS_REMOTE_PATH
+)
 
 
 def get_headshot_path(season: str, team: str, gsis_id: str) -> str:
@@ -54,3 +60,23 @@ def load(db_conn, df: pd.DataFrame, table_name: str, overwrite: bool = True, bac
         df.to_csv(output_path, index=False)
 
     logging.info(f"{table_name} successfully loaded to the database.")
+
+
+def download_image(remote_path: str, local_path: str) -> bool:
+    """Download an image, return True if successful else False.
+    
+    Adding a sleep at the end to avoid spamming a remote path.
+    """
+    logging.info(f"Saving image for {row['full_name']}....")
+    try:
+        urllib.request.urlretrieve(remote_path, local_path)
+        return True
+    except Exception as e:
+        logging.error(e)
+        return False
+
+    time.sleep(0.5)
+
+
+def download_team_logos() -> None:
+    df = pd.read_csv(TEAM_LOGOS_REMOTE_PATH)

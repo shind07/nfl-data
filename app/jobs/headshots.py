@@ -1,3 +1,6 @@
+"""
+https://github.com/fantasydatapros/nflfastpy/blob/master/examples/Roster%20Data%20and%20Team%20Logo%20Data.ipynb
+"""
 import logging
 import time
 import urllib.request
@@ -8,6 +11,7 @@ from app.config import configure_logging, HEADSHOTS_DIRECTORY
 from app.db import get_db_eng
 from app.utils import (
     get_headshot_path,
+    download_image,
     init_directory,
     load
 )
@@ -44,26 +48,17 @@ def _extract(db_conn) -> pd.DataFrame:
     return pd.read_sql(query, db_conn)
 
 
-def _get_headshot(row):
-    """Download the headshot locally, and mark the download attempt as successful or not."""
-    logging.info(f"Saving image for {row['full_name']}....")
-    try:
-        urllib.request.urlretrieve(row['headshot_url'], row['local_path'])
-        return True
-    except Exception as e:
-        logging.error(e)
-        return False
-
-    time.sleep(0.5)
-
-
 def _transform(df: pd.DataFrame) -> pd.DataFrame:
     """Get the local path and save the headshot."""
     logging.info(f"Downloading {len(df)} headshots...")
     df['local_path'] = df.apply(
-        lambda row: get_headshot_path(row['season'], row['team'], row['gsis_id']), axis=1
+        lambda row: get_headshot_path(row['season'], row['team'], row['gsis_id']),
+        axis=1
     )
-    df['success'] = df.apply(_get_headshot, axis=1)
+    df['success'] = df.apply(
+        lambda row: download_image(row['headshot_url'], row['local_path']),
+        axis=1
+    )
     return df
 
 
