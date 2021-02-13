@@ -34,6 +34,7 @@ def upgrade():
             td SMALLINT NOT NULL,
             int SMALLINT NOT NULL,
             fumbles SMALLINT NOT NULL,
+            fumbles_lost SMALLINT NOT NULL,
             epa DECIMAL NOT NULL,
             cpoe DECIMAL NOT NULL
         );

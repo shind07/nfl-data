@@ -35,11 +35,14 @@ def upgrade():
             air_yards_completed SMALLINT NOT NULL,
             td SMALLINT NOT NULL,
             int SMALLINT NOT NULL,
+            sacks SMALLINT NOT NULL,
+            sack_yards SMALLINT NOT NULL,
             fumbles SMALLINT NOT NULL,
+            fumbles_lost SMALLINT NOT NULL,
             spikes SMALLINT NOT NULL,
+            pass_epa DECIMAL NOT NULL,
+            spike_epa DECIMAL NOT NULL,
             epa DECIMAL NOT NULL,
-            epa_spikes DECIMAL NOT NULL,
-            epa_total DECIMAL NOT NULL,
             cpoe DECIMAL NOT NULL
         ); 
     """)
