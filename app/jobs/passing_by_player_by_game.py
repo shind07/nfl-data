@@ -29,18 +29,23 @@ def _extract(db_conn) -> pd.DataFrame:
             passer,
             SUM(complete_pass) AS completions,
             SUM(pass_attempt) AS attempts,
-            SUM(CASE WHEN lateral_rec_yards IS NOT NULL
-                THEN yards_gained + lateral_rec_yards
-                ELSE yards_gained END) AS yards,
-            SUM(air_yards) AS air_yards_intended,
+            SUM(CASE
+                WHEN lateral_rec_yards IS NOT NULL AND sack = 0 THEN yards_gained + lateral_rec_yards
+                WHEN sack = 0 THEN yards_gained
+                ELSE 0 END
+            ) AS yards,
+            SUM(CASE WHEN sack = 0 THEN air_yards ELSE 0 END) AS air_yards_intended,
             SUM(CASE WHEN complete_pass = 1 THEN air_yards ELSE 0 END) AS air_yards_completed,
             SUM(pass_touchdown) AS td,
             SUM(interception) as int,
-            SUM(fumble) as fumbles,
+            SUM(sack) as sacks,
+            SUM(CASE WHEN sack = 1 THEN yards_gained ELSE 0 END) AS sack_yards,
+            SUM(CASE WHEN sack = 1 THEN fumble ELSE 0 END) as fumbles,
+            SUM(CASE WHEN sack = 1 THEN fumble_lost ELSE 0 END) AS fumbles_lost,
             SUM(CASE WHEN play_type = 'qb_spike' THEN 1 ELSE 0 END) AS spikes,
-            SUM(CASE WHEN play_type != 'qb_spike' THEN epa ELSE 0 END) AS epa,
-            SUM(epa) AS epa_total,
-            SUM(CASE WHEN play_type = 'qb_spike' THEN epa ELSE 0 END) AS epa_spikes,
+            SUM(CASE WHEN play_type != 'qb_spike' THEN epa ELSE 0 END) AS pass_epa,
+            SUM(epa) AS epa,
+            SUM(CASE WHEN play_type = 'qb_spike' THEN epa ELSE 0 END) AS spike_epa,
             CASE WHEN
                 SUM(cpoe) IS NULL OR SUM(pass_attempt) = 0 THEN 0
                 ELSE SUM(cpoe) / SUM(pass_attempt) END
@@ -62,7 +67,6 @@ def _extract(db_conn) -> pd.DataFrame:
         WHERE
             (play_type = 'pass' or play_type = 'qb_spike')
             AND two_point_attempt = 0
-            AND sack = 0
         GROUP BY
             year, week, passer_gsis_id, passer_position,
             p.game_id, defteam, posteam, passer, season_type
