@@ -38,6 +38,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 SUM(pass_touchdown) AS td,
                 SUM(interception) AS int,
                 SUM(fumble) AS fumbles,
+                SUM(fumble_lost) as fumbles_lost,
                 SUM(epa) AS epa,
                 SUM(cpoe) AS cpoe
             FROM

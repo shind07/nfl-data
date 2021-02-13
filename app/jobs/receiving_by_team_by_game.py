@@ -37,6 +37,7 @@ def _extract_by_position(db_conn) -> pd.DataFrame:
             SUM(td) AS td,
             SUM(int) AS int,
             SUM(fumbles) as fumbles,
+            SUM(fumbles_lost) as fumbles_lost,
             SUM(epa) AS epa,
             SUM(cpoe) AS cpoe
         FROM
@@ -71,6 +72,7 @@ def _extract_all(db_conn) -> pd.DataFrame:
             SUM(td) AS td,
             SUM(int) AS int,
             SUM(fumbles) as fumbles,
+            SUM(fumbles_lost) as fumbles_lost,
             SUM(epa) AS epa,
             SUM(cpoe) AS cpoe
         FROM
