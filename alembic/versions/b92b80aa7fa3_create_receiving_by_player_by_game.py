@@ -27,7 +27,7 @@ def upgrade():
             week SMALLINT NOT NULL,
             gsis_id VARCHAR NOT NULL,
             pos VARCHAR NOT NULL,
-            receiver VARCHAR NOT NULL,
+            player VARCHAR NOT NULL,
             receptions SMALLINT NOT NULL,
             targets SMALLINT NOT NULL,
             yards SMALLINT NOT NULL,

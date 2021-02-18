@@ -24,7 +24,7 @@ def upgrade():
             team VARCHAR NOT NULL,
             gsis_id VARCHAR NOT NULL,
             pos VARCHAR NOT NULL,
-            receiver VARCHAR NOT NULL,
+            player VARCHAR NOT NULL,
             games SMALLINT NOT NULL,
             receptions SMALLINT NOT NULL,
             targets SMALLINT NOT NULL,
