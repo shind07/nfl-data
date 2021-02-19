@@ -33,7 +33,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 week,
                 receiver_gsis_id AS gsis_id,
                 receiver_position AS pos,
-                receiver,
+                receiver as player,
                 SUM(complete_pass) AS receptions,
                 SUM(pass_attempt) AS targets,
                 SUM(yards_gained) AS yards,

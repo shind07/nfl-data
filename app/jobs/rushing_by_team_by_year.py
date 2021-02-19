@@ -16,35 +16,20 @@ OUTPUT_TABLE_NAME = "rushing_by_team_by_year"
 
 
 def _extract(db_conn) -> pd.DataFrame:
-    """Getting rushing stats, per team per year, from rushing_by_player_by_game."""
-    logging.info("Extracting rushing stats by team by year from play by play...")
-    query = """
-        SELECT
-            year,
-            season_type,
-            team,
-            rush_type,
-            COUNT(DISTINCT game_id) as games,
-            SUM(attempts) AS attempts,
-            SUM(yards) AS yards,
-            SUM(td) AS td,
-            SUM(fumbles) AS fumbles,
-            SUM(fumbles_lost) AS fumbles_lost,
-            SUM(fumbles_out_of_bounds) AS fumbles_out_of_bounds,
-            SUM(epa) AS epa
-        FROM
-            rushing_by_player_by_game
-        GROUP BY
-            year,
-            season_type,
-            team,
-            rush_type
-        ORDER BY
-            SUM(yards) DESC
-    """
+    """Getting the raw rushing_by_player_by_game stats."""
+    logging.info("Extracting rushing stats by player by year from play by play...")
+    query = """SELECT * FROM rushing_by_team_by_game"""
     df = pd.read_sql(query, db_conn)
-    logging.info(f"Extracted {len(df)} rows of rushing stats.")
+    logging.info(f"Extracted {len(df)} rows of rushing by team by year stats.")
     return df
+
+
+def _transform(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate the per player stats to get the per team stats."""
+    logging.info("Aggregating the per game stats to the year level...")
+
+    grouping_cols = ['year', 'season_type', 'team']
+    return df.groupby(grouping_cols, as_index=False).sum()
 
 
 def run() -> None:

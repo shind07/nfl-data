@@ -16,46 +16,27 @@ OUTPUT_TABLE_NAME = "rushing_by_team_by_game"
 
 
 def _extract(db_conn) -> pd.DataFrame:
-    """Getting rushing stats, per team per game, from rushing_by_player_by_game."""
-    logging.info("Extracting rushing stats by team by game from play by play...")
-    query = """
-        SELECT
-            year,
-            season_type,
-            game_id,
-            team,
-            opp,
-            week,
-            rush_type,
-            SUM(attempts) AS attempts,
-            SUM(yards) AS yards,
-            SUM(td) AS td,
-            SUM(fumbles) AS fumbles,
-            SUM(fumbles_lost) AS fumbles_lost,
-            SUM(fumbles_out_of_bounds) AS fumbles_out_of_bounds,
-            SUM(epa) AS epa
-        FROM
-            rushing_by_player_by_game
-        GROUP BY
-            year,
-            season_type,
-            game_id,
-            week,
-            team,
-            opp,
-            rush_type
-        ORDER BY
-            SUM(yards) DESC
-    """
+    """Getting the raw rushing_by_player_by_game stats."""
+    logging.info("Extracting rushing stats by player by year from play by play...")
+    query = """SELECT * FROM rushing_by_player_by_game"""
     df = pd.read_sql(query, db_conn)
-    logging.info(f"Extracted {len(df)} rows of rushing stats.")
+    logging.info(f"Extracted {len(df)} rows of rushing by team by game stats.")
     return df
+
+
+def _transform(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate the per player stats to get the per team stats."""
+    logging.info("Aggregating the per player stats to the team level...")
+
+    grouping_cols = ['year', 'season_type', 'game_id', 'team', 'opp', 'week']
+    return df.groupby(grouping_cols, as_index=False).sum()
 
 
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
     with get_db_eng().connect() as db_conn:
         df = _extract(db_conn)
+        df = _transform(df)
         load(db_conn, df, OUTPUT_TABLE_NAME)
         logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
 

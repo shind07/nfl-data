@@ -24,7 +24,7 @@ def _extract(db_conn) -> pd.DataFrame:
             posteam AS team,
             passer_gsis_id AS gsis_id,
             passer_position AS pos,
-            passer,
+            passer as player,
             COUNT(DISTINCT p.game_id) AS games,
             SUM(complete_pass) AS completions,
             SUM(pass_attempt) AS attempts,

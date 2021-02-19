@@ -26,7 +26,7 @@ def _extract(db_conn) -> pd.DataFrame:
             week,
             passer_gsis_id AS gsis_id,
             passer_position AS pos,
-            passer,
+            passer as player,
             SUM(complete_pass) AS completions,
             SUM(pass_attempt) AS attempts,
             SUM(CASE
