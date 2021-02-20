@@ -29,13 +29,14 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
     logging.info("Aggregating the per game stats to the year level...")
 
     grouping_cols = ['year', 'season_type', 'team']
-    return df.groupby(grouping_cols, as_index=False).sum()
-
+    df = df.groupby(grouping_cols, as_index=False).sum()
+    return df.drop('week', axis=1)
 
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
     with get_db_eng().connect() as db_conn:
         df = _extract(db_conn)
+        df = _transform(df)
         load(db_conn, df, OUTPUT_TABLE_NAME)
         logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
 
