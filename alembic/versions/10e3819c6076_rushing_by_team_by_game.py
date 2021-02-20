@@ -60,7 +60,30 @@ def upgrade():
             fumbles SMALLINT NOT NULL,
             fumbles_lost SMALLINT NOT NULL,
             fumbles_out_of_bounds SMALLINT NOT NULL,
-            epa DECIMAL NOT NULL
+            epa DECIMAL NOT NULL,
+            attempts_rb SMALLINT NOT NULL,
+            yards_rb SMALLINT NOT NULL,
+            td_rb SMALLINT NOT NULL,
+            epa_rb DECIMAL NOT NULL,
+            attempts_qb_designed SMALLINT NOT NULL,
+            yards_qb_designed SMALLINT NOT NULL,
+            td_qb_designed SMALLINT NOT NULL,
+            epa_qb_designed DECIMAL NOT NULL,
+            attempts_qb_scramble SMALLINT NOT NULL,
+            yards_qb_scramble SMALLINT NOT NULL,
+            td_qb_scramble SMALLINT NOT NULL,
+            epa_qb_scramble DECIMAL NOT NULL,
+            attempts_qb_kneel SMALLINT NOT NULL,
+            yards_qb_kneel SMALLINT NOT NULL,
+            epa_qb_kneel DECIMAL NOT NULL,
+            attempts_wr SMALLINT NOT NULL,
+            yards_wr SMALLINT NOT NULL,
+            td_wr SMALLINT NOT NULL,
+            epa_wr DECIMAL NOT NULL,
+            attempts_other SMALLINT NOT NULL,
+            yards_other SMALLINT NOT NULL,
+            td_other SMALLINT NOT NULL,
+            epa_other DECIMAL NOT NULL
         );
     """)
 
