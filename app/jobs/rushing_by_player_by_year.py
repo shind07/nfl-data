@@ -9,6 +9,7 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
+    PLAYER_YEAR_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
@@ -28,8 +29,7 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
     """Aggregate the per game stats to get the per stats."""
     logging.info("Aggregating the per game stats to the year level...")
 
-    grouping_cols = ['year', 'season_type', 'team', 'gsis_id', 'pos', 'player']
-    df = df.groupby(grouping_cols, as_index=False).sum()
+    df = df.groupby(PLAYER_YEAR_GROUPING_COLUMNS, as_index=False).sum()
     df = df.drop('week', axis=1)
 
     # hacky way to do the group-by-count without dealing with too much pandas

@@ -9,6 +9,7 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
+    TEAM_GAME_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
@@ -76,8 +77,7 @@ def _extract_position(db_conn) -> pd.DataFrame:
 def _transform(df_all: pd.DataFrame, df_position: pd.DataFrame) -> pd.DataFrame:
     """Aggregate the per player stats to get the per team stats."""
     logging.info("Joining the position stats to the team totals...")
-    grouping_cols = ['year', 'season_type', 'game_id', 'team', 'opp', 'week']
-    df = df_all.groupby(grouping_cols, as_index=False).sum()
+    df = df_all.groupby(TEAM_GAME_GROUPING_COLUMNS, as_index=False).sum()
     return df.merge(df_position, on=grouping_cols)
 
 

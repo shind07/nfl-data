@@ -7,6 +7,7 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
+    PLAYER_GAME_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
@@ -147,8 +148,7 @@ def _transform(df_designed, df_scrambles, df_qb_kneels) -> pd.DataFrame:
     logging.info("Calculating total rushing stats...")
     df_all = pd.concat([df_designed, df_scrambles, df_qb_kneels])
 
-    grouping_cols = ['year', 'season_type', 'game_id', 'team', 'opp', 'week', 'gsis_id', 'pos', 'player']
-    df_totals = df_all.groupby(grouping_cols, as_index=False).sum()
+    df_totals = df_all.groupby(PLAYER_GAME_GROUPING_COLUMNS, as_index=False).sum()
 
     df_totals = _rename_cols(df_totals, '_total', grouping_cols)
     df_designed = _rename_cols(df_designed, '_designed', grouping_cols)
