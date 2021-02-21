@@ -96,7 +96,7 @@ def _extract_position(db_conn) -> pd.DataFrame:
             passer_gsis_id AS gsis_id,
             passer_position AS pos,
             passer as player,
-            
+
             -- WR stats
             SUM(complete_pass) FILTER (WHERE receiver_position = 'WR') AS completions_wr,
             SUM(pass_attempt) FILTER (WHERE receiver_position = 'WR') AS attempts_wr,
@@ -113,7 +113,7 @@ def _extract_position(db_conn) -> pd.DataFrame:
             SUM(interception) FILTER (WHERE receiver_position = 'WR') as int_wr,
             SUM(epa) FILTER (WHERE receiver_position = 'WR') AS epa_wr,
             SUM(cpoe) FILTER (WHERE receiver_position = 'WR') AS cpoe_wr,
-            
+
             -- TE stats
             SUM(complete_pass) FILTER (WHERE receiver_position = 'TE') AS completions_te,
             SUM(pass_attempt) FILTER (WHERE receiver_position = 'TE') AS attempts_te,
@@ -130,7 +130,7 @@ def _extract_position(db_conn) -> pd.DataFrame:
             SUM(interception) FILTER (WHERE receiver_position = 'TE') as int_te,
             SUM(epa) FILTER (WHERE receiver_position = 'TE') AS epa_te,
             SUM(cpoe) FILTER (WHERE receiver_position = 'TE') AS cpoe_te,
-            
+
             -- RB stats
             SUM(complete_pass) FILTER (WHERE receiver_position = 'RB') AS completions_rb,
             SUM(pass_attempt) FILTER (WHERE receiver_position = 'RB') AS attempts_rb,
@@ -166,11 +166,11 @@ def _extract_position(db_conn) -> pd.DataFrame:
             SUM(cpoe) FILTER (WHERE receiver_position IS NULL) AS cpoe_null,
 
             -- Other stats
-            SUM(complete_pass) FILTER 
+            SUM(complete_pass) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0)  AS completions_other,
-            SUM(pass_attempt) FILTER 
+            SUM(pass_attempt) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0)  AS attempts_other,
@@ -178,37 +178,37 @@ def _extract_position(db_conn) -> pd.DataFrame:
                 WHEN lateral_rec_yards IS NOT NULL AND sack = 0 THEN yards_gained + lateral_rec_yards
                 WHEN sack = 0 THEN yards_gained
                 ELSE 0 END
-            ) FILTER 
+            ) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
-                AND interception = 0) 
+                AND interception = 0)
             AS yards_other,
-            SUM(CASE WHEN sack = 0 THEN air_yards ELSE 0 END) FILTER 
+            SUM(CASE WHEN sack = 0 THEN air_yards ELSE 0 END) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0)  AS air_yards_intended_other,
             SUM(CASE WHEN complete_pass = 1 THEN air_yards ELSE 0 END)
-                FILTER 
+                FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0) AS air_yards_completed_other,
-            SUM(pass_touchdown) FILTER 
+            SUM(pass_touchdown) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0) AS td_other,
-            SUM(interception) FILTER 
+            SUM(interception) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0) as int_other,
-            SUM(epa) FILTER 
+            SUM(epa) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0) AS epa_other,
-            SUM(cpoe) FILTER 
+            SUM(cpoe) FILTER
                 (WHERE receiver_position NOT IN ('WR', 'TE', 'RB')
                 AND receiver_position IS NOT NULL
                 AND interception = 0) AS cpoe_other
-                        
+
         FROM
             play_by_play_enriched AS p
         LEFT JOIN
@@ -237,22 +237,22 @@ def _extract_position(db_conn) -> pd.DataFrame:
 
 def _transform(df_all: pd.DataFrame, df_position: pd.DataFrame) -> pd.DataFrame:
     df = df_all.merge(df_position, how='left', on=GAME_GROUPING_COLUMNS)
-    
+
     df['target_share_wr'] = df['attempts_wr'] / df['attempts']
     df['target_share_te'] = df['attempts_te'] / df['attempts']
     df['target_share_rb'] = df['attempts_rb'] / df['attempts']
     df['target_share_other'] = df['attempts_other'] / df['attempts']
-  
+
     df['air_yards_intended_share_wr'] = df['air_yards_intended_wr'] / df['air_yards_intended']
     df['air_yards_intended_share_te'] = df['air_yards_intended_te'] / df['air_yards_intended']
     df['air_yards_intended_share_rb'] = df['air_yards_intended_rb'] / df['air_yards_intended']
 
     df['air_yards_completed_share_wr'] = df['air_yards_completed_wr'] / df['air_yards_completed']
     df['air_yards_completed_share_te'] = df['air_yards_completed_te'] / df['air_yards_completed']
-    df['air_yards_completed_share_rb'] = df['air_yards_completed_rb'] / df['air_yards_completed']  
-    
+    df['air_yards_completed_share_rb'] = df['air_yards_completed_rb'] / df['air_yards_completed']
+
     df = df.replace([np.inf, -np.inf], np.nan)
-    return df.fillna(0)  
+    return df.fillna(0)
 
 
 def run() -> None:

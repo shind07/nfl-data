@@ -38,12 +38,12 @@ def _extract_position(db_conn) -> pd.DataFrame:
             SUM(CASE WHEN pos = 'RB' THEN yards ELSE 0 END) AS yards_rb,
             SUM(CASE WHEN pos = 'RB' THEN td ELSE 0 END) AS td_rb,
             SUM(CASE WHEN pos = 'RB' THEN epa ELSE 0 END) AS epa_rb,
-            
+
             SUM(CASE WHEN pos = 'QB' THEN attempts_designed ELSE 0 END) AS attempts_qb_designed,
             SUM(CASE WHEN pos = 'QB' THEN yards_designed ELSE 0 END) AS yards_qb_designed,
             SUM(CASE WHEN pos = 'QB' THEN td_designed ELSE 0 END) AS td_qb_designed,
             SUM(CASE WHEN pos = 'QB' THEN epa_designed ELSE 0 END) AS epa_qb_designed,
-            
+
             SUM(CASE WHEN pos = 'QB' THEN attempts_scramble ELSE 0 END) AS attempts_qb_scramble,
             SUM(CASE WHEN pos = 'QB' THEN yards_scramble ELSE 0 END) AS yards_qb_scramble,
             SUM(CASE WHEN pos = 'QB' THEN td_scramble ELSE 0 END) AS td_qb_scramble,
@@ -52,12 +52,12 @@ def _extract_position(db_conn) -> pd.DataFrame:
             SUM(CASE WHEN pos = 'QB' THEN attempts_kneel ELSE 0 END) AS attempts_qb_kneel,
             SUM(CASE WHEN pos = 'QB' THEN yards_kneel ELSE 0 END) AS yards_qb_kneel,
             SUM(CASE WHEN pos = 'QB' THEN epa_kneel ELSE 0 END) AS epa_qb_kneel,
-            
+
             SUM(CASE WHEN pos = 'WR' THEN attempts ELSE 0 END) AS attempts_wr,
             SUM(CASE WHEN pos = 'WR' THEN yards ELSE 0 END) AS yards_wr,
             SUM(CASE WHEN pos = 'WR' THEN td ELSE 0 END) AS td_wr,
             SUM(CASE WHEN pos = 'WR' THEN epa ELSE 0 END) AS epa_wr,
-            
+
             SUM(CASE WHEN pos NOT IN ('RB', 'WR', 'QB') THEN attempts ELSE 0 END) as attempts_other,
             SUM(CASE WHEN pos NOT IN ('RB', 'WR', 'QB') THEN yards ELSE 0 END) as yards_other,
             SUM(CASE WHEN pos NOT IN ('RB', 'WR', 'QB') THEN td ELSE 0 END) as td_other,

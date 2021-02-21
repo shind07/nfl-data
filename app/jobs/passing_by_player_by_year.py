@@ -43,10 +43,10 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
 
     df['air_yards_completed_share_wr'] = df['air_yards_completed_wr'] / df['air_yards_completed']
     df['air_yards_completed_share_te'] = df['air_yards_completed_te'] / df['air_yards_completed']
-    df['air_yards_completed_share_rb'] = df['air_yards_completed_rb'] / df['air_yards_completed']  
-    
+    df['air_yards_completed_share_rb'] = df['air_yards_completed_rb'] / df['air_yards_completed']
+
     df = df.replace([np.inf, -np.inf], np.nan)
-    return df.fillna(0) 
+    return df.fillna(0)
 
 
 def run() -> None:

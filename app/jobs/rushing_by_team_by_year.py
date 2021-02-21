@@ -32,6 +32,7 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
     df = df.groupby(grouping_cols, as_index=False).sum()
     return df.drop('week', axis=1)
 
+
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
     with get_db_eng().connect() as db_conn:

@@ -13,10 +13,10 @@ from app.jobs import (
     play_by_play_enriched,
     passing_by_player_by_game,
     passing_by_player_by_year,
+    passing_by_team_by_game,
+    passing_by_team_by_year,
     receiving_by_player_by_game,
     receiving_by_player_by_year,
-    receiving_by_team_by_game,
-    receiving_by_team_by_year,
     rushing_by_player_by_game,
     rushing_by_player_by_year,
     rushing_by_team_by_game,
@@ -27,25 +27,25 @@ from app.jobs import (
 def run(year: int = CURRENT_YEAR):
     """Run the pipeline if there are new games in the play by play data."""
     # raw data
-    # try:
-    #     play_by_play.run(year)
-    # except play_by_play.NoNewGamesException as e:
-    #     logging.info(e)
-    #     return
+    try:
+        play_by_play.run(year)
+    except play_by_play.NoNewGamesException as e:
+        logging.info(e)
+        return
 
-    # roster.run(year)
-    # headshots.run()
-    # lateral_receiving_yards.run(year)
-    # play_by_play_enriched.run()
+    roster.run(year)
+    headshots.run()
+    lateral_receiving_yards.run(year)
+    play_by_play_enriched.run()
 
     # aggregations
     passing_by_player_by_game.run()
     passing_by_player_by_year.run()
+    passing_by_team_by_game.run()
+    passing_by_team_by_year.run()
 
     receiving_by_player_by_game.run()
     receiving_by_player_by_year.run()
-    receiving_by_team_by_game.run()
-    receiving_by_team_by_year.run()
 
     rushing_by_player_by_game.run()
     rushing_by_player_by_year.run()

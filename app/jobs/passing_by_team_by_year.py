@@ -33,15 +33,15 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
     df['target_share_te'] = df['attempts_te'] / df['attempts']
     df['target_share_rb'] = df['attempts_rb'] / df['attempts']
     df['target_share_other'] = df['attempts_other'] / df['attempts']
-  
+
     df['air_yards_intended_share_wr'] = df['air_yards_intended_wr'] / df['air_yards_intended']
-    df['air_yards_intended_share_te'] = f['air_yards_intended_te'] / df['air_yards_intended']
+    df['air_yards_intended_share_te'] = df['air_yards_intended_te'] / df['air_yards_intended']
     df['air_yards_intended_share_rb'] = df['air_yards_intended_rb'] / df['air_yards_intended']
 
     df['air_yards_completed_share_wr'] = df['air_yards_completed_wr'] / df['air_yards_completed']
     df['air_yards_completed_share_te'] = df['air_yards_completed_te'] / df['air_yards_completed']
-    df['air_yards_completed_share_rb'] = df['air_yards_completed_rb'] / df['air_yards_completed']  
-    
+    df['air_yards_completed_share_rb'] = df['air_yards_completed_rb'] / df['air_yards_completed']
+
     df = df.replace([np.inf, -np.inf], np.nan)
     return df.fillna(0)
 
