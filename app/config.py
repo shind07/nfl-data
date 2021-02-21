@@ -15,6 +15,9 @@ HEADSHOTS_DIRECTORY = os.path.join(DATA_DIRECTORY, 'headshots')
 TEAM_LOGOS_DIRECTORY = os.path.join(DATA_DIRECTORY, 'logos')
 TEAM_LOGOS_CSV_PATH = os.path.join(TEAM_LOGOS_DIRECTORY, 'teams_logos_colors.csv')
 
+GAME_GROUPING_COLUMNS = ['year', 'season_type', 'game_id', 'team', 'opp', 'week', 'gsis_id', 'pos', 'player']
+SEASON_GROUPING_COLUMNS = ['year', 'season_type', 'team', 'gsis_id', 'pos', 'player']
+
 
 def configure_logging():
     logging.basicConfig(
