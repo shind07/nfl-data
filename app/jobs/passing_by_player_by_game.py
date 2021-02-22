@@ -26,7 +26,7 @@ def _extract_all(db_conn) -> pd.DataFrame:
             posteam AS team,
             defteam AS opp,
             week,
-            passer_gsis_id AS gsis_id,
+            passer_id AS gsis_id,
             passer_position AS pos,
             passer as player,
             SUM(complete_pass) AS completions,
@@ -72,7 +72,7 @@ def _extract_all(db_conn) -> pd.DataFrame:
             (play_type = 'pass' or play_type = 'qb_spike')
             AND two_point_attempt = 0
         GROUP BY
-            year, week, passer_gsis_id, passer_position,
+            year, week, passer_id, passer_position,
             p.game_id, defteam, posteam, passer, season_type
         ORDER BY
             epa DESC
@@ -93,7 +93,7 @@ def _extract_position(db_conn) -> pd.DataFrame:
             posteam AS team,
             defteam AS opp,
             week,
-            passer_gsis_id AS gsis_id,
+            passer_id AS gsis_id,
             passer_position AS pos,
             passer as player,
 
@@ -226,7 +226,7 @@ def _extract_position(db_conn) -> pd.DataFrame:
         WHERE
             play_type = 'pass' AND sack = 0 AND two_point_attempt = 0
         GROUP BY
-            year, week, passer_gsis_id, passer_position,
+            year, week, passer_id, passer_position,
             p.game_id, defteam, posteam, passer, season_type
     """
     df = pd.read_sql(query, db_conn)

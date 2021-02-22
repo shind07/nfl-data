@@ -27,17 +27,6 @@ from app.db import get_db_eng, load
 OUTPUT_TABLE_NAME = 'play_by_play_enriched'
 
 
-def _convert_to_gsis_id(pbp_id):
-    """Convert the play by play id to gsis id"""
-    if pbp_id is None:
-        return None
-
-    if type(pbp_id) == float:
-        return pbp_id
-
-    return codecs.decode(pbp_id[4:-8].replace('-', ''), "hex").decode('utf-8')
-
-
 def _extract(db_conn) -> pd.DataFrame:
     """Get the upstream tables."""
     logging.info("Extracting play by play data...")
@@ -61,9 +50,6 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         df_play_by_play['passer_player_name'],
         df_play_by_play['passer']
     )
-    df_play_by_play['passer_gsis_id'] = df_play_by_play['passer_id'] #.apply(_convert_to_gsis_id)
-    df_play_by_play['receiver_gsis_id'] = df_play_by_play['receiver_id'] #.apply(_convert_to_gsis_id)
-    df_play_by_play['rusher_gsis_id'] = df_play_by_play['rusher_id'] #.apply(_convert_to_gsis_id)
 
     logging.info("Adding position data from roster table...")
     df_roster_slim = df_roster[['season', 'position', 'gsis_id']]
@@ -74,7 +60,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
     df_enriched = df_play_by_play.merge(
         df_roster_slim,
         how='left',
-        left_on=['season', 'receiver_gsis_id'],
+        left_on=['season', 'receiver_id'],
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'receiver_position'})
@@ -83,7 +69,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
     df_enriched = df_enriched.merge(
         df_roster_slim,
         how='left',
-        left_on=['season', 'rusher_gsis_id'],
+        left_on=['season', 'rusher_id'],
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'rusher_position'})
@@ -92,7 +78,7 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
     df_enriched = df_enriched.merge(
         df_roster_slim,
         how='left',
-        left_on=['season', 'passer_gsis_id'],
+        left_on=['season', 'passer_id'],
         right_on=['season', 'gsis_id']
     )
     df_enriched = df_enriched.rename(columns={'position': 'passer_position'})
@@ -116,10 +102,10 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         left_on=['season', 'posteam', 'passer'],
         right_on=['season', 'team', 'player']
     )
-    df_enriched['passer_gsis_id'] = np.where(
-        df_enriched['passer_gsis_id'].isna(),
+    df_enriched['passer_id'] = np.where(
+        df_enriched['passer_id'].isna(),
         df_enriched['gsis_id_2'],
-        df_enriched['passer_gsis_id']
+        df_enriched['passer_id']
     )
     df_enriched['passer_position'] = np.where(
         df_enriched['passer_position'].isna(),

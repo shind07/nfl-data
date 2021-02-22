@@ -31,7 +31,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 posteam AS team,
                 defteam AS opp,
                 week,
-                receiver_gsis_id AS gsis_id,
+                receiver_id AS gsis_id,
                 receiver_position AS pos,
                 receiver as player,
                 SUM(complete_pass) AS receptions,
@@ -53,7 +53,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 AND sack = 0
                 AND receiver IS NOT NULL
             GROUP BY
-                year, game_id, receiver_gsis_id, receiver_position,
+                year, game_id, receiver_id, receiver_position,
                 week, defteam, posteam, receiver, season_type
             ) receiving
         LEFT JOIN

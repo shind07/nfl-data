@@ -32,7 +32,7 @@ def _extract_designed(db_conn) -> pd.DataFrame:
             defteam AS opp,
             posteam AS team,
             week,
-            rusher_gsis_id AS gsis_id,
+            rusher_id AS gsis_id,
             rusher_position AS pos,
             rusher as player,
             SUM(rush) AS attempts,
@@ -49,7 +49,7 @@ def _extract_designed(db_conn) -> pd.DataFrame:
             AND two_point_attempt = 0
             AND rusher is not null
         GROUP BY
-            year, season_type, game_id, rusher_gsis_id, rusher_position,
+            year, season_type, game_id, rusher_id, rusher_position,
             week, posteam, defteam, rusher_id, rusher
         ORDER BY
             yards DESC
@@ -74,7 +74,7 @@ def _extract_scrambles(db_conn) -> pd.DataFrame:
             defteam AS opp,
             posteam AS team,
             week,
-            passer_gsis_id AS gsis_id,
+            passer_id AS gsis_id,
             passer_position as pos,
             passer AS player,
             SUM(pass) AS attempts,
@@ -92,7 +92,7 @@ def _extract_scrambles(db_conn) -> pd.DataFrame:
             AND passer is not null
         GROUP BY
             year, season_type, game_id, week,
-            posteam, defteam, passer_position, passer_gsis_id, passer
+            posteam, defteam, passer_position, passer_id, passer
         ORDER BY
             yards DESC
     """
@@ -113,7 +113,7 @@ def _extract_qb_kneels(db_conn) -> pd.DataFrame:
             posteam AS team,
             week,
             rusher_position as pos,
-            rusher_gsis_id as gsis_id,
+            rusher_id as gsis_id,
             rusher as player,
             SUM(qb_kneel) AS attempts,
             SUM(yards_gained) AS yards,
@@ -128,7 +128,7 @@ def _extract_qb_kneels(db_conn) -> pd.DataFrame:
             play_type = 'qb_kneel'
         GROUP BY
             year, season_type, game_id, week,
-            posteam, defteam, rusher_position, rusher_gsis_id, rusher
+            posteam, defteam, rusher_position, rusher_id, rusher
         ORDER BY
             yards DESC
     """

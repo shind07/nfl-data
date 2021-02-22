@@ -26,7 +26,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 year,
                 season_type,
                 posteam AS team,
-                receiver_gsis_id AS gsis_id,
+                receiver_id AS gsis_id,
                 receiver_position AS pos,
                 receiver as player,
                 COUNT(DISTINCT game_id) as games,
@@ -49,7 +49,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 AND sack = 0
                 AND receiver IS NOT NULL
             GROUP BY
-                year, posteam, receiver_gsis_id, receiver_position, receiver, season_type) receiving
+                year, posteam, receiver_id, receiver_position, receiver, season_type) receiving
         LEFT JOIN
             (SELECT
                 year,
