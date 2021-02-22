@@ -8,7 +8,7 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
-    GAME_GROUPING_COLUMNS
+    PLAYER_GAME_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
@@ -228,7 +228,6 @@ def _extract_position(db_conn) -> pd.DataFrame:
         GROUP BY
             year, week, passer_gsis_id, passer_position,
             p.game_id, defteam, posteam, passer, season_type
-        ORDER BY yards_wr desc NULLS LAST
     """
     df = pd.read_sql(query, db_conn)
     logging.info(f"Extracted {len(df)} rows of passing stats.")
@@ -236,7 +235,8 @@ def _extract_position(db_conn) -> pd.DataFrame:
 
 
 def _transform(df_all: pd.DataFrame, df_position: pd.DataFrame) -> pd.DataFrame:
-    df = df_all.merge(df_position, how='left', on=GAME_GROUPING_COLUMNS)
+    """Join the totals to the positional data and compute rate stats."""
+    df = df_all.merge(df_position, how='left', on=PLAYER_GAME_GROUPING_COLUMNS)
 
     df['target_share_wr'] = df['attempts_wr'] / df['attempts']
     df['target_share_te'] = df['attempts_te'] / df['attempts']

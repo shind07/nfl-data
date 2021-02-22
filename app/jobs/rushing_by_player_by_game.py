@@ -150,27 +150,27 @@ def _transform(df_designed, df_scrambles, df_qb_kneels) -> pd.DataFrame:
 
     df_totals = df_all.groupby(PLAYER_GAME_GROUPING_COLUMNS, as_index=False).sum()
 
-    df_totals = _rename_cols(df_totals, '_total', grouping_cols)
-    df_designed = _rename_cols(df_designed, '_designed', grouping_cols)
-    df_scrambles = _rename_cols(df_scrambles, '_scramble', grouping_cols)
-    df_qb_kneels = _rename_cols(df_qb_kneels, '_kneel', grouping_cols)
+    df_totals = _rename_cols(df_totals, '_total', PLAYER_GAME_GROUPING_COLUMNS)
+    df_designed = _rename_cols(df_designed, '_designed', PLAYER_GAME_GROUPING_COLUMNS)
+    df_scrambles = _rename_cols(df_scrambles, '_scramble', PLAYER_GAME_GROUPING_COLUMNS)
+    df_qb_kneels = _rename_cols(df_qb_kneels, '_kneel', PLAYER_GAME_GROUPING_COLUMNS)
 
     df_all = (
         df_totals
         .merge(
             df_designed,
             how='outer',
-            on=grouping_cols,
+            on=PLAYER_GAME_GROUPING_COLUMNS,
         )
         .merge(
             df_scrambles,
             how='outer',
-            on=grouping_cols,
+            on=PLAYER_GAME_GROUPING_COLUMNS,
         )
         .merge(
             df_qb_kneels,
             how='outer',
-            on=grouping_cols,
+            on=PLAYER_GAME_GROUPING_COLUMNS,
         )
         .fillna(0)
     )

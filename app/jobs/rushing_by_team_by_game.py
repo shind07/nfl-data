@@ -78,7 +78,7 @@ def _transform(df_all: pd.DataFrame, df_position: pd.DataFrame) -> pd.DataFrame:
     """Aggregate the per player stats to get the per team stats."""
     logging.info("Joining the position stats to the team totals...")
     df = df_all.groupby(TEAM_GAME_GROUPING_COLUMNS, as_index=False).sum()
-    return df.merge(df_position, on=grouping_cols)
+    return df.merge(df_position, on=TEAM_GAME_GROUPING_COLUMNS)
 
 
 def run() -> None:

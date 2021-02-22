@@ -33,9 +33,9 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
     df = df.drop('week', axis=1)
 
     # hacky way to do the group-by-count without dealing with too much pandas
-    df_count = df.groupby(grouping_cols, as_index=False).size()
+    df_count = df.groupby(PLAYER_YEAR_GROUPING_COLUMNS, as_index=False).size()
     df_count = df_count.rename(columns={'size': 'games'})
-    return df.merge(df_count, on=grouping_cols)
+    return df.merge(df_count, on=PLAYER_YEAR_GROUPING_COLUMNS)
 
 
 def run() -> None:

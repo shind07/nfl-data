@@ -61,9 +61,9 @@ def _transform(df_play_by_play, df_roster) -> pd.DataFrame:
         df_play_by_play['passer_player_name'],
         df_play_by_play['passer']
     )
-    df_play_by_play['passer_gsis_id'] = df_play_by_play['passer_id'].apply(_convert_to_gsis_id)
-    df_play_by_play['receiver_gsis_id'] = df_play_by_play['receiver_id'].apply(_convert_to_gsis_id)
-    df_play_by_play['rusher_gsis_id'] = df_play_by_play['rusher_id'].apply(_convert_to_gsis_id)
+    df_play_by_play['passer_gsis_id'] = df_play_by_play['passer_id'] #.apply(_convert_to_gsis_id)
+    df_play_by_play['receiver_gsis_id'] = df_play_by_play['receiver_id'] #.apply(_convert_to_gsis_id)
+    df_play_by_play['rusher_gsis_id'] = df_play_by_play['rusher_id'] #.apply(_convert_to_gsis_id)
 
     logging.info("Adding position data from roster table...")
     df_roster_slim = df_roster[['season', 'position', 'gsis_id']]

@@ -8,7 +8,7 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
-    YEAR_GROUPING_COLUMNS
+    PLAYER_YEAR_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
@@ -29,7 +29,7 @@ def _transform(df: pd.DataFrame) -> pd.DataFrame:
     """Aggregate per game stats to the year level"""
     logging.info("Aggregating per game passing stats to per year...")
     df = df[[col for col in df.columns if "_share" not in col]]
-    df = df.groupby(YEAR_GROUPING_COLUMNS, as_index=False).sum()
+    df = df.groupby(PLAYER_YEAR_GROUPING_COLUMNS, as_index=False).sum()
     df = df.drop('week', axis=1)
 
     df['target_share_wr'] = df['attempts_wr'] / df['attempts']
