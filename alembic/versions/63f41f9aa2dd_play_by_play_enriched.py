@@ -384,9 +384,6 @@ def upgrade():
             xpass DECIMAL,
             pass_oe DECIMAL,
             year DECIMAL NOT NULL,
-            passer_gsis_id VARCHAR,
-            receiver_gsis_id VARCHAR,
-            rusher_gsis_id VARCHAR,
             passer_position VARCHAR,
             receiver_position VARCHAR,
             rusher_position VARCHAR
