@@ -30,7 +30,7 @@ def _extract_all(db_conn) -> pd.DataFrame:
             passer_position AS pos,
             passer as player,
             SUM(complete_pass) AS completions,
-            SUM(pass_attempt) AS attempts,
+            SUM(pass_attempt) - SUM(sack) AS attempts, 
             SUM(CASE
                 WHEN lateral_rec_yards IS NOT NULL AND sack = 0 THEN yards_gained + lateral_rec_yards
                 WHEN sack = 0 THEN yards_gained
