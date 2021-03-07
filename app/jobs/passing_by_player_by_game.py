@@ -50,10 +50,7 @@ def _extract_all(db_conn) -> pd.DataFrame:
             SUM(CASE WHEN interception = 1 THEN epa ELSE 0 END) as epa_int,
             SUM(CASE WHEN sack = 1 THEN epa ELSE 0 END) AS epa_sack,
             SUM(CASE WHEN play_type = 'qb_spike' THEN epa ELSE 0 END) AS epa_spike,
-            CASE WHEN
-                SUM(cpoe) IS NULL OR SUM(pass_attempt) = 0 THEN 0
-                ELSE SUM(cpoe) / SUM(pass_attempt) END
-            AS cpoe
+            SUM(cpoe) AS cpoe
         FROM
             play_by_play_enriched AS p
         LEFT JOIN
