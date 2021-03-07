@@ -9,6 +9,7 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
+    PLAYER_YEAR_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
@@ -16,47 +17,32 @@ OUTPUT_TABLE_NAME = "rushing_by_player_by_year"
 
 
 def _extract(db_conn) -> pd.DataFrame:
-    """Getting designed rushing stats, per player per year, from the play by play."""
+    """Getting the raw rushing_by_player_by_game stats."""
     logging.info("Extracting rushing stats by player by year from play by play...")
-    query = """
-        SELECT
-            year,
-            season_type,
-            team,
-            gsis_id,
-            pos,
-            rusher,
-            rush_type,
-            COUNT(DISTINCT game_id) as games,
-            SUM(attempts) AS attempts,
-            SUM(yards) AS yards,
-            SUM(td) AS td,
-            SUM(fumbles) AS fumbles,
-            SUM(fumbles_lost) AS fumbles_lost,
-            SUM(fumbles_out_of_bounds) AS fumbles_out_of_bounds,
-            SUM(epa) AS epa
-        FROM
-            rushing_by_player_by_game
-        GROUP BY
-            year,
-            season_type,
-            team,
-            gsis_id,
-            pos,
-            rusher,
-            rush_type
-        ORDER BY
-            SUM(yards) DESC
-    """
+    query = """SELECT * FROM rushing_by_player_by_game"""
     df = pd.read_sql(query, db_conn)
-    logging.info(f"Extracted {len(df)} rows of rushing stats.")
+    logging.info(f"Extracted {len(df)} rows of rushing by player by game stats.")
     return df
+
+
+def _transform(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate the per game stats to get the per stats."""
+    logging.info("Aggregating the per game stats to the year level...")
+
+    df = df.groupby(PLAYER_YEAR_GROUPING_COLUMNS, as_index=False).sum()
+    df = df.drop('week', axis=1)
+
+    # hacky way to do the group-by-count without dealing with too much pandas
+    df_count = df.groupby(PLAYER_YEAR_GROUPING_COLUMNS, as_index=False).size()
+    df_count = df_count.rename(columns={'size': 'games'})
+    return df.merge(df_count, on=PLAYER_YEAR_GROUPING_COLUMNS)
 
 
 def run() -> None:
     logging.info(f"Running job for {OUTPUT_TABLE_NAME}...")
     with get_db_eng().connect() as db_conn:
         df = _extract(db_conn)
+        df = _transform(df)
         load(db_conn, df, OUTPUT_TABLE_NAME)
         logging.info(f"Job for {OUTPUT_TABLE_NAME} complete.")
 

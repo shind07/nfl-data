@@ -26,9 +26,9 @@ def _extract(db_conn) -> pd.DataFrame:
                 year,
                 season_type,
                 posteam AS team,
-                receiver_gsis_id AS gsis_id,
+                receiver_id AS gsis_id,
                 receiver_position AS pos,
-                receiver,
+                receiver as player,
                 COUNT(DISTINCT game_id) as games,
                 SUM(complete_pass) AS receptions,
                 SUM(pass_attempt) AS targets,
@@ -38,6 +38,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 SUM(pass_touchdown) AS td,
                 SUM(interception) AS int,
                 SUM(fumble) AS fumbles,
+                SUM(fumble_lost) as fumbles_lost,
                 SUM(epa) AS epa,
                 SUM(cpoe) AS cpoe
             FROM
@@ -48,7 +49,7 @@ def _extract(db_conn) -> pd.DataFrame:
                 AND sack = 0
                 AND receiver IS NOT NULL
             GROUP BY
-                year, posteam, receiver_gsis_id, receiver_position, receiver, season_type) receiving
+                year, posteam, receiver_id, receiver_position, receiver, season_type) receiving
         LEFT JOIN
             (SELECT
                 year,

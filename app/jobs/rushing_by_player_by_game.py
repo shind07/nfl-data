@@ -7,10 +7,18 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
+    PLAYER_GAME_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
 OUTPUT_TABLE_NAME = "rushing_by_player_by_game"
+
+
+def _rename_cols(df: pd.DataFrame, suffix: str, exempt: list) -> pd.DataFrame:
+    """Append a suffix to a subset of columns."""
+    return df.rename(columns={
+        col: f"{col}{suffix}" for col in df.columns if col not in exempt
+    })
 
 
 def _extract_designed(db_conn) -> pd.DataFrame:
@@ -24,10 +32,9 @@ def _extract_designed(db_conn) -> pd.DataFrame:
             defteam AS opp,
             posteam AS team,
             week,
-            rusher_gsis_id AS gsis_id,
+            rusher_id AS gsis_id,
             rusher_position AS pos,
-            rusher,
-            'designed' AS rush_type,
+            rusher as player,
             SUM(rush) AS attempts,
             SUM(yards_gained) AS yards,
             SUM(rush_touchdown) AS td,
@@ -42,7 +49,7 @@ def _extract_designed(db_conn) -> pd.DataFrame:
             AND two_point_attempt = 0
             AND rusher is not null
         GROUP BY
-            year, season_type, game_id, rusher_gsis_id, rusher_position,
+            year, season_type, game_id, rusher_id, rusher_position,
             week, posteam, defteam, rusher_id, rusher
         ORDER BY
             yards DESC
@@ -67,11 +74,10 @@ def _extract_scrambles(db_conn) -> pd.DataFrame:
             defteam AS opp,
             posteam AS team,
             week,
-            passer_gsis_id AS gsis_id,
+            passer_id AS gsis_id,
             passer_position as pos,
-            passer AS rusher,
-            'scramble' AS rush_type,
-            SUM(rush) AS attempts,
+            passer AS player,
+            SUM(pass) AS attempts,
             SUM(yards_gained) AS yards,
             SUM(rush_touchdown) AS td,
             SUM(fumble) AS fumbles,
@@ -86,7 +92,7 @@ def _extract_scrambles(db_conn) -> pd.DataFrame:
             AND passer is not null
         GROUP BY
             year, season_type, game_id, week,
-            posteam, defteam, passer_position, passer_gsis_id, passer
+            posteam, defteam, passer_position, passer_id, passer
         ORDER BY
             yards DESC
     """
@@ -107,10 +113,9 @@ def _extract_qb_kneels(db_conn) -> pd.DataFrame:
             posteam AS team,
             week,
             rusher_position as pos,
-            rusher_gsis_id as gsis_id,
-            rusher,
-            'qb_kneel' AS rush_type,
-            SUM(rush) AS attempts,
+            rusher_id as gsis_id,
+            rusher as player,
+            SUM(qb_kneel) AS attempts,
             SUM(yards_gained) AS yards,
             SUM(rush_touchdown) AS td,
             SUM(fumble) AS fumbles,
@@ -123,7 +128,7 @@ def _extract_qb_kneels(db_conn) -> pd.DataFrame:
             play_type = 'qb_kneel'
         GROUP BY
             year, season_type, game_id, week,
-            posteam, defteam, rusher_position, rusher_gsis_id, rusher
+            posteam, defteam, rusher_position, rusher_id, rusher
         ORDER BY
             yards DESC
     """
@@ -134,22 +139,53 @@ def _extract_qb_kneels(db_conn) -> pd.DataFrame:
 
 def _transform(df_designed, df_scrambles, df_qb_kneels) -> pd.DataFrame:
     """
-    Concat all 3 rushing stats into a single DF.
-    Then sum them to get the total rushing stats.
-    Then add the total rushing stats to the DF with the original 3 rushing stats.
-    The final DF has 4 possible rows distinguished by 'rush_type', which can either
-    be designed, scramble, qb_kneel, or total.
+    Grab the rushing stats for the 3 rushing types (designed, scramble, kneel) and
+    total them. Then join all 4 tables to create one table with all the rushing stats.
+
+    Then, add designed and scramble stats to get basic rushing stats. These stats may
+    differ slightly from official stats since qb kneels are excluded.
     """
     logging.info("Calculating total rushing stats...")
     df_all = pd.concat([df_designed, df_scrambles, df_qb_kneels])
 
-    grouping_cols = ['year', 'season_type', 'game_id', 'team', 'opp', 'week', 'gsis_id', 'pos', 'rusher']
-    df_totals = df_all.groupby(grouping_cols, as_index=False).sum()
-    df_totals['rush_type'] = 'total'
-    df_final = pd.concat([df_all, df_totals])
+    df_totals = df_all.groupby(PLAYER_GAME_GROUPING_COLUMNS, as_index=False).sum()
 
-    logging.info(f"Created {len(df_final)} rows of rushing stats.")
-    return df_final
+    df_totals = _rename_cols(df_totals, '_total', PLAYER_GAME_GROUPING_COLUMNS)
+    df_designed = _rename_cols(df_designed, '_designed', PLAYER_GAME_GROUPING_COLUMNS)
+    df_scrambles = _rename_cols(df_scrambles, '_scramble', PLAYER_GAME_GROUPING_COLUMNS)
+    df_qb_kneels = _rename_cols(df_qb_kneels, '_kneel', PLAYER_GAME_GROUPING_COLUMNS)
+
+    df_all = (
+        df_totals
+        .merge(
+            df_designed,
+            how='outer',
+            on=PLAYER_GAME_GROUPING_COLUMNS,
+        )
+        .merge(
+            df_scrambles,
+            how='outer',
+            on=PLAYER_GAME_GROUPING_COLUMNS,
+        )
+        .merge(
+            df_qb_kneels,
+            how='outer',
+            on=PLAYER_GAME_GROUPING_COLUMNS,
+        )
+        .fillna(0)
+    )
+
+    df_all['attempts'] = df_all['attempts_designed'] + df_all['attempts_scramble']
+    df_all['yards'] = df_all['yards_designed'] + df_all['yards_scramble']
+    df_all['td'] = df_all['td_designed'] + df_all['td_scramble']
+    df_all['fumbles'] = df_all['fumbles_designed'] + df_all['fumbles_scramble']
+    df_all['fumbles_lost'] = df_all['fumbles_lost_designed'] + df_all['fumbles_lost_scramble']
+    df_all['fumbles_out_of_bounds'] = df_all['fumbles_out_of_bounds_designed'] + \
+        df_all['fumbles_out_of_bounds_scramble']
+    df_all['epa'] = df_all['epa_designed'] + df_all['epa_scramble']
+
+    logging.info(f"Created {len(df_all)} rows of rushing stats.")
+    return df_all
 
 
 def run() -> None:

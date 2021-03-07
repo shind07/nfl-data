@@ -33,14 +33,13 @@ def _extract(db_conn) -> pd.DataFrame:
             LEFT JOIN headshots h
             ON
                 r.season = h.season
-                AND r.team = h.team
+                AND (r.team = h.team OR r.team IS NULL)
                 AND r.gsis_id = h.gsis_id
             ) x
         WHERE
             local_path IS NULL
             AND headshot_url IS NOT NULL
             AND gsis_id IS NOT NULL
-            AND x.local_path IS NOT NULL
     """
     return pd.read_sql(query, db_conn)
 

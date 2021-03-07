@@ -35,12 +35,11 @@ def download_image(remote_path: str, local_path: str) -> bool:
     logging.info(f"Saving image from {remote_path} to {local_path}....")
     try:
         urllib.request.urlretrieve(remote_path, local_path)
+        time.sleep(0.2)
         return True
     except Exception as e:
         logging.error(e)
         return False
-
-    time.sleep(0.5)
 
 
 def download_team_logos() -> None:

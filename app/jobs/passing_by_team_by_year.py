@@ -1,5 +1,5 @@
 """
-Upstream jobs: play_by_play_enriched
+Upstream jobs: passing_by_player_by_game
 """
 import logging
 
@@ -8,28 +8,25 @@ import pandas as pd
 
 from app.config import (
     configure_logging,
-    PLAYER_YEAR_GROUPING_COLUMNS
+    TEAM_YEAR_GROUPING_COLUMNS
 )
 from app.db import get_db_eng, load
 
-
-OUTPUT_TABLE_NAME = "passing_by_player_by_year"
+OUTPUT_TABLE_NAME = "passing_by_team_by_year"
 
 
 def _extract(db_conn) -> pd.DataFrame:
-    """Getting passing stats, per player per year"""
-    logging.info("Extracting passing stats by player by game from play by play...")
-    query = """SELECT * FROM passing_by_player_by_game"""
+    """Getting passing stats, per team per game for all positions"""
+    logging.info("Extracting receving stats by player by game from play by play...")
+    query = "SELECT * FROM passing_by_player_by_game"
     df = pd.read_sql(query, db_conn)
-    logging.info(f"Extracted {len(df)} rows of passing stats.")
-    return df
+    return df[[col for col in df.columns if "_share" not in col]]
 
 
 def _transform(df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate per game stats to the year level"""
-    logging.info("Aggregating per game passing stats to per year...")
-    df = df[[col for col in df.columns if "_share" not in col]]
-    df = df.groupby(PLAYER_YEAR_GROUPING_COLUMNS, as_index=False).sum()
+    """Aggregate player stats to the team level, recalculate the rate stats."""
+    logging.info("Aggregating the player per game stats to the team/year level...")
+    df = df.groupby(TEAM_YEAR_GROUPING_COLUMNS, as_index=False).sum()
     df = df.drop('week', axis=1)
 
     df['target_share_wr'] = df['attempts_wr'] / df['attempts']

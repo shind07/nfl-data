@@ -12,8 +12,10 @@ build:
 
 .PHONY: run
 run:
-	docker-compose run --rm \
-		-v $(shell PWD)/app:/$(WORKDIR)/app app
+	docker-compose run \
+		--rm \
+		-v $(shell PWD)/app:/$(WORKDIR)/app \
+		app
 
 .PHONY: notebook
 notebook:
